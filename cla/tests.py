@@ -23,7 +23,7 @@ def set_settings(settings: settings):
 
 @pytest.fixture
 def webhook_url(settings: settings):
-    return reverse(f"webhooks-icla-{settings.ICLA_WEBHOOK_SECRET_SLUG}")
+    return reverse(f"webhooks-icla")
 
 
 def test_render_icla_signing_request_form(client: Client):

@@ -11,8 +11,8 @@ urlpatterns = [
     path("icla/submit/", send_signing_request_icla, name="icla-submit"),
     path(
         f"webhooks/icla/{settings.ICLA_WEBHOOK_SECRET_SLUG}/",
-        handle_submission_completed_webhook,
-        name=f"webhooks-icla-{settings.ICLA_WEBHOOK_SECRET_SLUG}",
+        handle_icla_submission_completed_webhook,
+        name="webhooks-icla",
     ),
     path("admin/", admin.site.urls),
 ]

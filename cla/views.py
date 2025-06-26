@@ -50,7 +50,7 @@ def render_icla_signing_request_form(request: HttpRequest) -> HttpResponse:
 
 @require_POST
 @csrf_exempt
-def handle_submission_completed_webhook(request: HttpRequest) -> HttpResponse:
+def handle_icla_submission_completed_webhook(request: HttpRequest) -> HttpResponse:
     payload = json.loads(request.body)
     submitter = payload["data"]["submitters"][0]
 

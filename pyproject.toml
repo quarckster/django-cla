@@ -1,0 +1,21 @@
+[project]
+name = "cla-app"
+version = "0.1.0"
+description = "Django based web application to handle CLA requests"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "django>=5.2.3",
+    "docuseal>=1.0.7",
+    "dynaconf[yaml]>=3.2.11",
+    "pytest-django>=4.11.1",
+]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "base.settings"
+python_files = "tests.py test_*.py *_tests.py"
+
+[dependency-groups]
+dev = [
+    "pre-commit>=4.2.0",
+]

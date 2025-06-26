@@ -1,7 +1,6 @@
 import json
 import logging
 
-from django import forms
 from django.conf import settings
 from django.http import HttpRequest
 from django.http import HttpResponse
@@ -12,18 +11,21 @@ from django.views.decorators.http import require_POST
 from django.views.decorators.http import require_safe
 from docuseal import docuseal
 
+from .forms import CCLASigningRequestForm
+from .forms import ICLASigningRequestForm
 from .models import ICLA
 
 
 logger = logging.getLogger(__name__)
 
 
-class ICLASigningRequestForm(forms.Form):
-    email = forms.EmailField(label="Email", required=True)
+@require_POST
+def send_ccla_signing_request(request: HttpRequest) -> HttpResponse:
+    pass
 
 
 @require_POST
-def send_signing_request_icla(request: HttpRequest) -> HttpResponse:
+def send_icla_signing_request(request: HttpRequest) -> HttpResponse:
     form = ICLASigningRequestForm(request.POST)
     if not form.is_valid():
         return HttpResponseBadRequest(b"Submitted form is not valid")
@@ -43,9 +45,15 @@ def send_signing_request_icla(request: HttpRequest) -> HttpResponse:
 
 
 @require_safe
+def render_ccla_signing_request_form(request: HttpRequest) -> HttpResponse:
+    form = CCLASigningRequestForm()
+    return render(request, "cla/ccla_signing_request.html", {"form": form})
+
+
+@require_safe
 def render_icla_signing_request_form(request: HttpRequest) -> HttpResponse:
     form = ICLASigningRequestForm()
-    return render(request, "cla/icla_sign_request.html", {"form": form})
+    return render(request, "cla/icla_signing_request.html", {"form": form})
 
 
 @require_POST

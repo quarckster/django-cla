@@ -8,13 +8,15 @@
   <form action="submit/" method="post">
     {% csrf_token %}
     <p>
-      {{ form.point_of_contact_name.label_tag }}<br>
-      {{ form.point_of_contact_name }}
+      {{ form.company.label_tag }}<br>
+      {{ form.company }}
     </p>
-    <p>
-      {{ form.point_of_contact_email.label_tag }}<br>
-      {{ form.point_of_contact_email }}
-    </p>
+    <p>Authorized Signer</p>
+    <small>This is an individual in your organization who is authorized to sign the
+           Contributor License Agreement on behalf of your organization. They will
+           receive an email with a link to a webpage where they can read and sign
+           the agreement electronically.
+    </small>
     <p>
       {{ form.authorized_signer_name.label_tag }}<br>
       {{ form.authorized_signer_name }}

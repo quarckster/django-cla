@@ -10,10 +10,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = ""
 
-ICLA_WEBHOOK_SECRET_SLUG = ""
 CCLA_WEBHOOK_SECRET_SLUG = ""
+ICLA_WEBHOOK_SECRET_SLUG = ""
 
 DOCUSEAL_KEY = ""
+DOCUSEAL_CCLA_TEMPLATE_ID = ""
 DOCUSEAL_ICLA_TEMPLATE_ID = ""
 
 # SECURITY WARNING: don't run with debug turned on in production!

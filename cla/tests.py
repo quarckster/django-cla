@@ -12,6 +12,7 @@ from cla.models import ICLA
 
 
 FIXED_NOW = datetime(2025, 6, 25, 13, 45, 31, 892000, tzinfo=timezone.utc)
+WEBHOOK_ICLA_URL = reverse("webhooks-icla")
 
 
 @pytest.fixture(autouse=True)
@@ -19,11 +20,6 @@ def set_settings(settings: settings):
     settings.DOCUSEAL_KEY = "test_docuseal_key"
     settings.DOCUSEAL_ICLA_TEMPLATE_ID = "test_template_id"
     settings.ICLA_WEBHOOK_SECRET_SLUG = "test_secret_slug"
-
-
-@pytest.fixture
-def webhook_url(settings: settings):
-    return reverse(f"webhooks-icla")
 
 
 def test_render_icla_signing_request_form(client: Client):
@@ -95,7 +91,7 @@ def test_send_signing_request_icla_invalid_form(client: Client):
 
 
 @pytest.mark.django_db
-def test_handle_submission_completed_webhook_success(client: Client, webhook_url: str):
+def test_handle_submission_completed_webhook_success(client: Client):
     """
     Test that a valid webhook payload successfully creates an ICLA object.
     """
@@ -122,7 +118,7 @@ def test_handle_submission_completed_webhook_success(client: Client, webhook_url
         },
     }
 
-    response = client.post(webhook_url, json.dumps(payload), content_type="application/json")
+    response = client.post(WEBHOOK_ICLA_URL, json.dumps(payload), content_type="application/json")
 
     assert response.status_code == 200
     assert response.content == b"ok"
@@ -138,7 +134,7 @@ def test_handle_submission_completed_webhook_success(client: Client, webhook_url
 
 
 @pytest.mark.django_db(transaction=True)
-def test_handle_submission_completed_webhook_missing_fields(client: Client, webhook_url: str):
+def test_handle_submission_completed_webhook_missing_fields(client: Client):
     """
     Test that a webhook payload with missing mandatory fields results in a server error.
     """
@@ -159,13 +155,13 @@ def test_handle_submission_completed_webhook_missing_fields(client: Client, webh
         },
     }
 
-    response = client.post(webhook_url, json.dumps(payload), content_type="application/json")
+    response = client.post(WEBHOOK_ICLA_URL, json.dumps(payload), content_type="application/json")
     assert response.status_code == 400
     assert ICLA.objects.count() == 0
 
 
 @pytest.mark.django_db
-def test_handle_submission_completed_webhook_empty_mailing_address2(client: Client, webhook_url: str):
+def test_handle_submission_completed_webhook_empty_mailing_address2(client: Client):
     """
     Test that a valid webhook payload with an empty Mailing Address 2 creates an ICLA object correctly.
     """
@@ -192,7 +188,7 @@ def test_handle_submission_completed_webhook_empty_mailing_address2(client: Clie
         },
     }
 
-    response = client.post(webhook_url, json.dumps(payload), content_type="application/json")
+    response = client.post(WEBHOOK_ICLA_URL, json.dumps(payload), content_type="application/json")
 
     assert response.status_code == 200
     assert response.content == b"ok"

@@ -110,7 +110,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = "static/"
+STATIC_URL = "/static/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -122,7 +122,7 @@ LOGGING = {
     "disable_existing_loggers": False,
     "formatters": {
         "custom": {
-            "format": "[%(asctime)s] <%(name)s> %(message)s",
+            "format": "[%(asctime)s] <%(name)s> %(levelname)s: %(message)s",
             "datefmt": "%d/%b/%Y %H:%M:%S",
         },
     },

@@ -3,6 +3,7 @@ import logging
 
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.db import transaction
 from django.http import HttpRequest
 from django.http import HttpResponse
 from django.http import HttpResponseBadRequest
@@ -71,6 +72,8 @@ def send_ccla_signing_request(request: HttpRequest) -> HttpResponse:
                 ],
             }
         )
+    else:
+        logger.info("%s has already signed CCLA", company)
     return HttpResponse(b"Signing request has been sent")
 
 
@@ -92,6 +95,8 @@ def send_icla_signing_request(request: HttpRequest) -> HttpResponse:
                 "submitters": [{"email": email, "role": "Contributor", "values": {"Email": email}}],
             }
         )
+    else:
+        logger.warning("%s has already signed ICLA", email)
     return HttpResponse(b"Signing request has been sent")
 
 
@@ -116,13 +121,15 @@ def make_submission_data_map(submitter_values: list[dict[str, str]]) -> dict[str
 
 @require_POST
 @csrf_exempt
+@transaction.atomic
 def handle_ccla_submission_completed_webhook(request: HttpRequest) -> HttpResponse:
     payload = json.loads(request.body)
     submitter = payload["data"]["submitters"][0]
     submission_data = make_submission_data_map(submitter["values"])
     if diff := set(CCLA_EXPECTED_FIELDS).difference(submission_data.keys()):
-        logger.error("Missing expected fields: %s", ", ".join(diff))
-        return HttpResponseBadRequest()
+        msg = "Missing expected fields: %s", ", ".join(diff)
+        logger.error(msg)
+        return HttpResponseBadRequest(msg)
     address_1 = submission_data["Corporation address 1"]
     address_2 = submission_data["Corporation address 2"]
     address_3 = submission_data["Corporation address 3"]
@@ -133,22 +140,18 @@ def handle_ccla_submission_completed_webhook(request: HttpRequest) -> HttpRespon
     user, _ = User.objects.get_or_create(
         username=poc_email, first_name=poc_first_name, last_name=poc_last_name, email=poc_email
     )
-    try:
-        CCLA(
-            authorized_signer_email=submitter["email"],
-            authorized_signer_name=submitter["name"],
-            authorized_signer_title=submission_data["Title"],
-            corporation_address=address_1 + address_2 + address_3,
-            corporation_name=submission_data["Corporation name"],
-            docuseal_submission_id=payload["data"]["id"],
-            fax=submission_data["Fax"],
-            point_of_contact=user,
-            signed_at=submitter["completed_at"],
-            telephone=submission_data["Telephone"],
-        ).save()
-    except Exception as e:
-        logger.exception(e)
-        return HttpResponseBadRequest()
+    CCLA(
+        authorized_signer_email=submitter["email"],
+        authorized_signer_name=submitter["name"],
+        authorized_signer_title=submission_data["Title"],
+        corporation_address=address_1 + address_2 + address_3,
+        corporation_name=submission_data["Corporation name"],
+        docuseal_submission_id=payload["data"]["id"],
+        fax=submission_data["Fax"],
+        point_of_contact=user,
+        signed_at=submitter["completed_at"],
+        telephone=submission_data["Telephone"],
+    ).save()
     return HttpResponse(b"ok")
 
 
@@ -159,20 +162,17 @@ def handle_icla_submission_completed_webhook(request: HttpRequest) -> HttpRespon
     submitter = payload["data"]["submitters"][0]
     submission_data = make_submission_data_map(submitter["values"])
     if diff := set(ICLA_EXPECTED_FIELDS).difference(submission_data.keys()):
-        logger.error("Missing expected fields: %s", ", ".join(diff))
-        return HttpResponseBadRequest()
-    try:
-        ICLA(
-            country=submission_data["Country"],
-            docuseal_submission_id=payload["data"]["id"],
-            email=submission_data["Email"],
-            full_name=submission_data["Full Name"],
-            mailing_address=submission_data["Mailing Address 1"] + submission_data["Mailing Address 2"],
-            public_name=submission_data["Public Name"],
-            signed_at=submitter["completed_at"],
-            telephone=submission_data["Telephone"],
-        ).save()
-    except Exception as e:
-        logger.exception(e)
-        return HttpResponseBadRequest()
+        msg = "Missing expected fields: %s", ", ".join(diff)
+        logger.error(msg)
+        return HttpResponseBadRequest(msg)
+    ICLA(
+        country=submission_data["Country"],
+        docuseal_submission_id=payload["data"]["id"],
+        email=submission_data["Email"],
+        full_name=submission_data["Full Name"],
+        mailing_address=submission_data["Mailing Address 1"] + submission_data["Mailing Address 2"],
+        public_name=submission_data["Public Name"],
+        signed_at=submitter["completed_at"],
+        telephone=submission_data["Telephone"],
+    ).save()
     return HttpResponse(b"ok")

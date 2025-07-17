@@ -21,6 +21,10 @@ DOCUSEAL_ICLA_TEMPLATE_ID = ""
 
 NOTIFICATIONS_EMAIL = ""
 
+ADMIN_SITE_HEADER = ""
+ADMIN_SITE_TITLE = ""
+ADMIN_SITE_INDEX_TITLE = ""
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 

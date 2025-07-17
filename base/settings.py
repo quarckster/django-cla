@@ -13,9 +13,13 @@ SECRET_KEY = ""
 CCLA_WEBHOOK_SECRET_SLUG = ""
 ICLA_WEBHOOK_SECRET_SLUG = ""
 
+DOCUMENTS_PATH = BASE_DIR
+
 DOCUSEAL_KEY = ""
 DOCUSEAL_CCLA_TEMPLATE_ID = ""
 DOCUSEAL_ICLA_TEMPLATE_ID = ""
+
+NOTIFICATIONS_EMAIL = ""
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -150,6 +154,8 @@ LOGGING = {
         },
     },
 }
+
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 # HERE STARTS DYNACONF EXTENSION LOAD (Keep at the very bottom of settings.py)
 # Read more at https://www.dynaconf.com/django/

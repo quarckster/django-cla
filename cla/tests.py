@@ -1,13 +1,13 @@
 import json
 from datetime import datetime
 from datetime import timezone
-from unittest import mock
 
 import pytest
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.test import Client
 from django.urls import reverse
+from pytest_mock import MockerFixture
 
 from cla.models import CCLA
 from cla.models import ICLA
@@ -54,12 +54,12 @@ def test_render_icla_signing_request_form(client: Client):
     assert b'<button type="submit">Send signing request</button>' in response.content
 
 
-@mock.patch("cla.views.docuseal.create_submission")
 @pytest.mark.django_db
-def test_send_signing_request_ccla_new_email(mock_create_submission, settings: settings, client: Client):
+def test_send_signing_request_ccla_new_email(mocker: MockerFixture, settings: settings, client: Client):
     """
     Test that a signing request is sent for a new email and no CCLA is created yet.
     """
+    mock_create_submission = mocker.patch("cla.views.docuseal.create_submission")
     company = "Company"
     authorized_signer_name = "John Doe"
     authorized_signer_email = "john.doe@example.com"
@@ -92,12 +92,12 @@ def test_send_signing_request_ccla_new_email(mock_create_submission, settings: s
     assert CCLA.objects.count() == 0
 
 
-@mock.patch("cla.views.docuseal.create_submission")
 @pytest.mark.django_db
-def test_send_signing_request_icla_new_email(mock_create_submission, settings: settings, client: Client):
+def test_send_signing_request_icla_new_email(mocker: MockerFixture, settings: settings, client: Client):
     """
     Test that a signing request is sent for a new email and no ICLA is created yet.
     """
+    mock_create_submission = mocker.patch("cla.views.docuseal.create_submission")
     email = "new_contributor@example.com"
     response = client.post(reverse("icla-submit"), {"email": email})
 
@@ -120,12 +120,12 @@ def test_send_signing_request_icla_new_email(mock_create_submission, settings: s
     assert ICLA.objects.count() == 0
 
 
-@mock.patch("cla.views.docuseal.create_submission")
 @pytest.mark.django_db
-def test_send_signing_request_ccla_existing_ccla(mock_create_submission, client: Client):
+def test_send_signing_request_ccla_existing_ccla(mocker: MockerFixture, client: Client):
     """
     Test that a signing request is not sent if an CCLA for the email already exists.
     """
+    mock_create_submission = mocker.patch("cla.views.docuseal.create_submission")
     authorized_signer_email = "john.doe@example.com"
     authorized_signer_name = "John Doe"
     company = "Company"
@@ -157,12 +157,13 @@ def test_send_signing_request_ccla_existing_ccla(mock_create_submission, client:
     assert CCLA.objects.count() == 1
 
 
-@mock.patch("cla.views.docuseal.create_submission")
 @pytest.mark.django_db
-def test_send_signing_request_icla_existing_icla(mock_create_submission, client: Client):
+def test_send_signing_request_icla_existing_icla(mocker: MockerFixture, client: Client):
     """
     Test that a signing request is not sent if an ICLA for the email already exists.
     """
+    mock_create_submission = mocker.patch("cla.views.docuseal.create_submission")
+    mock_download_document = mocker.patch("cla.models.download_document")
     email = "existing_contributor@example.com"
     ICLA.objects.create(
         email=email,
@@ -173,6 +174,7 @@ def test_send_signing_request_icla_existing_icla(mock_create_submission, client:
         public_name="Existing",
         telephone="555-1234",
     )
+    mock_download_document.assert_called_once()
 
     response = client.post(reverse("icla-submit"), {"email": email})
 
@@ -284,10 +286,11 @@ def test_handle_icla_submission_completed_webhook_missing_fields(client: Client)
 
 
 @pytest.mark.django_db
-def test_handle_icla_submission_completed_webhook_empty_mailing_address2(client: Client):
+def test_handle_icla_submission_completed_webhook_empty_mailing_address2(mocker: MockerFixture, client: Client):
     """
     Test that a valid webhook payload with an empty Mailing Address 2 creates an ICLA object correctly.
     """
+    mocker.patch("cla.models.download_document")
     payload = {
         "event_type": "submission.completed",
         "timestamp": "2025-06-25T13:45:33.140Z",

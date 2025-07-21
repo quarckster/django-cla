@@ -3,6 +3,7 @@ from django import forms
 
 class ICLASigningRequestForm(forms.Form):
     email = forms.EmailField(label="Email", required=True)
+    point_of_contact = forms.EmailField(label="Point of contact", required=False)
 
 
 class CCLASigningRequestForm(forms.Form):

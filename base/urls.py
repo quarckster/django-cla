@@ -2,18 +2,14 @@ from django.conf import settings
 from django.contrib import admin
 from django.urls import path
 
+from cla.views import get_csrf_token
 from cla.views import handle_ccla_submission_completed_webhook
 from cla.views import handle_icla_submission_completed_webhook
-from cla.views import render_ccla_signing_request_form
-from cla.views import render_icla_signing_request_form
-from cla.views import send_ccla_signing_request
 from cla.views import send_icla_signing_request
 
 
 urlpatterns = [
-    path("ccla/", render_ccla_signing_request_form, name="ccla"),
-    path("icla/", render_icla_signing_request_form, name="icla"),
-    path("ccla/submit/", send_ccla_signing_request, name="ccla-submit"),
+    path("csrf/", get_csrf_token, name="csrf"),
     path("icla/submit/", send_icla_signing_request, name="icla-submit"),
     path(
         f"webhooks/ccla/{settings.CCLA_WEBHOOK_SECRET_SLUG}/",

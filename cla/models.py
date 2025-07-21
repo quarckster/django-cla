@@ -57,6 +57,9 @@ class ICLA(models.Model):
         )
 
     def save(self, **kwargs) -> None:
+        if not self.cla_pdf and self.docuseal_submission_id:
+            download_document(self)
+            self.cla_pdf = cla_file_name(self)
         super().save(**kwargs)
         if self.signed_at:
             poc = " with point of contact" if self.point_of_contact else ""
@@ -68,9 +71,6 @@ class ICLA(models.Model):
                 [settings.NOTIFICATIONS_RECIPIENT_EMAIL],
                 fail_silently=False,
             )
-        if not self.cla_pdf and self.docuseal_submission_id:
-            download_document(self)
-            self.cla_pdf = cla_file_name(self)
 
     @property
     def is_volunteer(self) -> bool:

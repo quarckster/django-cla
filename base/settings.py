@@ -15,6 +15,8 @@ ICLA_WEBHOOK_SECRET_SLUG = ""
 
 MEDIA_ROOT = BASE_DIR
 
+CLOUDFLARE_TURNSTILE_SECRET_KEY = ""
+
 DOCUSEAL_KEY = ""
 DOCUSEAL_CCLA_TEMPLATE_ID = ""
 DOCUSEAL_ICLA_TEMPLATE_ID = ""
@@ -35,6 +37,7 @@ ALLOWED_HOSTS: list[str] = []
 
 INSTALLED_APPS = [
     "cla.apps.ClaConfig",
+    "corsheaders",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -44,6 +47,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",

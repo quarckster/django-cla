@@ -31,7 +31,7 @@ ADMIN_SITE_INDEX_TITLE = ""
 DEBUG = True
 
 ALLOWED_HOSTS: list[str] = []
-
+APPEND_SLASH = True
 
 # Application definition
 

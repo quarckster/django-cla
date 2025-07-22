@@ -32,6 +32,8 @@ DEBUG = True
 
 ALLOWED_HOSTS: list[str] = []
 APPEND_SLASH = True
+CSRF_COOKIE_SECURE = False
+SESSION_COOKIE_SECURE = False
 
 # Application definition
 

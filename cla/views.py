@@ -155,3 +155,12 @@ def handle_icla_submission_completed_webhook(request: HttpRequest) -> HttpRespon
     icla.telephone = submission_data["Telephone"]
     icla.save()
     return HttpResponse("ok")
+
+
+@require_safe
+def get_icla_status(request: HttpRequest, email: str) -> JsonResponse:
+    try:
+        icla = ICLA.objects.get(email=email)
+        return JsonResponse({"email": email, "active": icla.is_active})
+    except ICLA.DoesNotExist:
+        return JsonResponse({"email": email, "active": False})

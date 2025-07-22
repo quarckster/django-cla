@@ -14,4 +14,4 @@ admin.site.register(CCLA)
 
 @admin.register(ICLA)
 class ICLAModelAdmin(admin.ModelAdmin):
-    list_display = ("email", "full_name", "signed_at", "is_volunteer")
+    list_display = ("email", "full_name", "signed_at", "is_volunteer", "is_active")

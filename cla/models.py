@@ -74,7 +74,15 @@ class ICLA(models.Model):
 
     @property
     def is_volunteer(self) -> bool:
-        return self.employer_approved_at is None
+        return not bool(self.point_of_contact)
+
+    @property
+    def is_active(self) -> bool:
+        if not self.is_volunteer and bool(self.employer_approved_at) and bool(self.signed_at):
+            return True
+        if self.is_volunteer and bool(self.signed_at):
+            return True
+        return False
 
     def __str__(self) -> str:
         return f"{self.email}"

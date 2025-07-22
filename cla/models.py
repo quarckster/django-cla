@@ -1,5 +1,6 @@
 import logging
 import uuid
+from pathlib import Path
 
 import requests
 from django.conf import settings
@@ -13,7 +14,9 @@ logger = logging.getLogger(__name__)
 
 
 def cla_file_name(cla: "CCLA | ICLA", filename: str = "") -> str:
-    return f"ICLA/{cla.id}.pdf" if isinstance(cla, ICLA) else f"CCLA/{cla.id}.pdf"
+    path = settings.MEDIA_ROOT / type(cla).__name__ / f"{cla.id}.pdf"
+    relative = path.relative_to(settings.BASE_DIR)
+    return str(relative)
 
 
 def download_document(cla: "CCLA | ICLA") -> None:
@@ -21,6 +24,7 @@ def download_document(cla: "CCLA | ICLA") -> None:
     docuseal_api_resp = docuseal.get_submission_documents(cla.docuseal_submission_id)
     link = docuseal_api_resp["documents"][0]["url"]
     r = requests.get(link)
+    Path(cla_file_name(cla)).parent.mkdir(parents=True, exist_ok=True)
     with open(cla_file_name(cla), "wb") as f:
         f.write(r.content)
 

@@ -3,8 +3,10 @@ import logging
 
 import requests
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db import transaction
+from django.http import FileResponse
 from django.http import HttpRequest
 from django.http import HttpResponse
 from django.http import HttpResponseBadRequest
@@ -164,3 +166,10 @@ def get_icla_status(request: HttpRequest, email: str) -> JsonResponse:
         return JsonResponse({"email": email, "active": icla.is_active})
     except ICLA.DoesNotExist:
         return JsonResponse({"email": email, "active": False})
+
+
+@require_safe
+@login_required
+def get_cla_pdf(request: HttpRequest, cla_type: str, file_name: str) -> HttpResponse:
+    path = settings.MEDIA_ROOT / cla_type / file_name
+    return FileResponse(open(path, "rb"))

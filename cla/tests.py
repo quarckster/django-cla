@@ -1,6 +1,7 @@
 import json
 from datetime import datetime
 from datetime import timezone
+from typing import Any
 
 import pytest
 from django.conf import settings
@@ -22,6 +23,47 @@ def set_settings(settings: settings):
     settings.DOCUSEAL_CCLA_TEMPLATE_ID = "123457"
     settings.ICLA_WEBHOOK_SECRET_SLUG = "test_secret_slug"
     settings.CCLA_WEBHOOK_SECRET_SLUG = "test_secret_slug"
+
+
+def test_get_csrf_token(client: Client):
+    response = client.get(reverse("csrf"))
+    assert response.status_code == 200
+    assert response.content
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "fields",
+    [
+        {"point_of_contact": "user@example.com", "employer_approved_at": FIXED_NOW},
+        {"point_of_contact": "user@example.com", "signed_at": FIXED_NOW},
+        {},
+    ],
+    ids=["employee-not-signed", "employee-not-approved", "volunteer-not-signed"],
+)
+def test_get_icla_status_not_active(client: Client, fields: dict[str, Any]):
+    email = "test@example.com"
+    ICLA.objects.create(email=email, **fields)
+    response = client.get(reverse("icla-email-status", args=(email,)))
+    assert response.status_code == 200
+    assert json.loads(response.content) == {"email": email, "active": False}
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "fields",
+    [
+        {"point_of_contact": "user@example.com", "employer_approved_at": FIXED_NOW, "signed_at": FIXED_NOW},
+        {"signed_at": FIXED_NOW},
+    ],
+    ids=["employee", "volunteer"],
+)
+def test_get_icla_status_active(client: Client, fields: dict[str, Any]):
+    email = "test@example.com"
+    ICLA.objects.create(email=email, **fields)
+    response = client.get(reverse("icla-email-status", args=(email,)))
+    assert response.status_code == 200
+    assert json.loads(response.content) == {"email": email, "active": True}
 
 
 @pytest.mark.django_db

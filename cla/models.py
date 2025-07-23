@@ -35,18 +35,18 @@ class ICLA(models.Model):
         verbose_name_plural = "ICLAs"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    country = models.CharField()
+    country = models.CharField(max_length=255)
     docuseal_submission_id = models.IntegerField(blank=True, null=True)
     cla_pdf = models.FileField("CLA pdf", upload_to=cla_file_name)
     email = models.EmailField(unique=True, db_index=True)
     employer_approved_at = models.DateTimeField(blank=True, null=True)
-    full_name = models.CharField()
-    mailing_address = models.CharField()
+    full_name = models.CharField(max_length=255)
+    mailing_address = models.CharField(max_length=255)
     point_of_contact = models.EmailField(blank=True)
     ccla_manager = models.ForeignKey(User, on_delete=models.PROTECT, blank=True, null=True, verbose_name="CCLA manager")
-    public_name = models.CharField(blank=True)
+    public_name = models.CharField(blank=True, max_length=255)
     signed_at = models.DateTimeField(blank=True, null=True)
-    telephone = models.CharField(blank=True)
+    telephone = models.CharField(blank=True, max_length=255)
 
     def create_docuseal_submission(self) -> None:
         logger.info("Create ICLA Docuseal submission for %s", self.email)
@@ -99,17 +99,17 @@ class CCLA(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     authorized_signer_email = models.EmailField(unique=True)
-    authorized_signer_name = models.CharField()
-    authorized_signer_title = models.CharField(blank=True)
+    authorized_signer_name = models.CharField(max_length=255)
+    authorized_signer_title = models.CharField(blank=True, max_length=255)
     cla_pdf = models.FileField("CLA pdf", upload_to=cla_file_name)
-    corporation_address = models.CharField()
-    corporation_alias = models.CharField(blank=True)
-    corporation_name = models.CharField(unique=True)
+    corporation_address = models.CharField(max_length=255)
+    corporation_alias = models.CharField(blank=True, max_length=255)
+    corporation_name = models.CharField(unique=True, max_length=255)
     docuseal_submission_id = models.IntegerField(blank=True, null=True)
-    fax = models.CharField(blank=True)
+    fax = models.CharField(blank=True, max_length=255)
     ccla_manager = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name="CCLA manager")
     signed_at = models.DateTimeField(blank=True, null=True)
-    telephone = models.CharField()
+    telephone = models.CharField(max_length=255)
 
     def create_docuseal_submission(self) -> None:
         logger.info("Create CCLA Docuseal submission for %s", self.company)

@@ -1,15 +1,15 @@
-#!/bin/sh
+#!/bin/bash
 
 set -ex
 
 
 pytest() {
-    uv run python -m pytest "$@"
+    uv run --no-dev --locked python -m pytest "$@"
 }
 
 
 manage.py() {
-    uv run python manage.py "$@"
+    uv run --no-dev --locked python manage.py "$@"
 }
 
 

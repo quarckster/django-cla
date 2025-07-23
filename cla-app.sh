@@ -4,7 +4,7 @@ set -ex
 
 
 pytest() {
-    uv run --no-dev --locked python -m pytest "$@"
+    uv run --locked python -m pytest "$@"
 }
 
 

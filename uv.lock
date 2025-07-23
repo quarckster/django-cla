@@ -70,8 +70,6 @@ dependencies = [
     { name = "docuseal" },
     { name = "dynaconf", extra = ["yaml"] },
     { name = "gunicorn" },
-    { name = "pytest-django" },
-    { name = "pytest-mock" },
     { name = "requests" },
 ]
 
@@ -80,6 +78,8 @@ dev = [
     { name = "ipython" },
     { name = "pre-commit" },
     { name = "pudb" },
+    { name = "pytest-django" },
+    { name = "pytest-mock" },
 ]
 
 [package.metadata]
@@ -89,8 +89,6 @@ requires-dist = [
     { name = "docuseal", specifier = ">=1.0.7" },
     { name = "dynaconf", extras = ["yaml"], specifier = ">=3.2.11" },
     { name = "gunicorn", specifier = ">=23.0.0" },
-    { name = "pytest-django", specifier = ">=4.11.1" },
-    { name = "pytest-mock", specifier = ">=3.14.1" },
     { name = "requests", specifier = ">=2.32.4" },
 ]
 
@@ -99,6 +97,8 @@ dev = [
     { name = "ipython", specifier = ">=9.4.0" },
     { name = "pre-commit", specifier = ">=4.2.0" },
     { name = "pudb", specifier = ">=2025.1" },
+    { name = "pytest-django", specifier = ">=4.11.1" },
+    { name = "pytest-mock", specifier = ">=3.14.1" },
 ]
 
 [[package]]

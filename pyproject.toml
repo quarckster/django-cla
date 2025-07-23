@@ -10,8 +10,6 @@ dependencies = [
     "docuseal>=1.0.7",
     "dynaconf[yaml]>=3.2.11",
     "gunicorn>=23.0.0",
-    "pytest-django>=4.11.1",
-    "pytest-mock>=3.14.1",
     "requests>=2.32.4",
 ]
 
@@ -24,4 +22,6 @@ dev = [
     "ipython>=9.4.0",
     "pre-commit>=4.2.0",
     "pudb>=2025.1",
+    "pytest-django>=4.11.1",
+    "pytest-mock>=3.14.1",
 ]

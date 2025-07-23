@@ -5,12 +5,13 @@ description = "Django based web application to handle CLA requests"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
+    "cloud-sql-python-connector[pymysql]>=1.18.3",
     "django>=5.2.3",
     "django-cors-headers>=4.7.0",
     "docuseal>=1.0.7",
     "dynaconf[yaml]>=3.2.11",
     "gunicorn>=23.0.0",
-    "mysqlclient>=2.2.7",
+    "pymysql>=1.1.1",
     "requests>=2.32.4",
 ]
 

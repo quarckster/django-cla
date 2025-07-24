@@ -14,9 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 def cla_file_name(cla: "CCLA | ICLA", filename: str = "") -> str:
-    path = settings.MEDIA_ROOT / type(cla).__name__ / f"{cla.id}.pdf"
-    relative = path.relative_to(settings.BASE_DIR)
-    return str(relative)
+    return f"{type(cla).__name__}/{cla.id}.pdf"
 
 
 def download_document(cla: "CCLA | ICLA") -> None:
@@ -24,9 +22,9 @@ def download_document(cla: "CCLA | ICLA") -> None:
     docuseal_api_resp = docuseal.get_submission_documents(cla.docuseal_submission_id)
     link = docuseal_api_resp["documents"][0]["url"]
     r = requests.get(link)
-    Path(cla_file_name(cla)).parent.mkdir(parents=True, exist_ok=True)
-    with open(cla_file_name(cla), "wb") as f:
-        f.write(r.content)
+    path: Path = settings.MEDIA_ROOT / cla_file_name(cla)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(r.content)
 
 
 class ICLA(models.Model):

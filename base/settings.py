@@ -135,6 +135,11 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
+    "filters": {
+        "disallowedhost_filter": {
+            "()": "base.logging_filters.DisallowedHostFilter",
+        },
+    },
     "formatters": {
         "custom": {
             "format": "[%(asctime)s] <%(name)s> %(levelname)s: %(message)s",
@@ -146,6 +151,7 @@ LOGGING = {
             "class": "logging.StreamHandler",
             "formatter": "custom",
             "level": "INFO",
+            "filters": ["disallowedhost_filter"],
         },
     },
     "root": {

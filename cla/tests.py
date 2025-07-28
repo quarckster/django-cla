@@ -23,6 +23,7 @@ def set_settings(settings: settings):
     settings.DOCUSEAL_CCLA_TEMPLATE_ID = "123457"
     settings.ICLA_WEBHOOK_SECRET_SLUG = "test_secret_slug"
     settings.CCLA_WEBHOOK_SECRET_SLUG = "test_secret_slug"
+    settings.ICLA_SUBMISSION_SUCCESS_URL = "https://example.com/success/"
 
 
 def test_get_csrf_token(client: Client):
@@ -81,8 +82,8 @@ def test_send_signing_request_icla_new_email(
     email = "new_contributor@example.com"
     response = client.post(reverse("icla-submit"), {"email": email, "cf-turnstile-response": "token", **payload})
 
-    assert response.status_code == 200
-    assert response.content == b"Signing request has been sent"
+    assert response.status_code == 302
+    assert response.url == settings.ICLA_SUBMISSION_SUCCESS_URL
     mock_verify_turnstile_token.assert_called_once()
     mock_create_submission.assert_called_once_with(
         {
@@ -135,8 +136,8 @@ def test_send_signing_request_icla_existing_icla(mocker: MockerFixture, client: 
 
     response = client.post(reverse("icla-submit"), {"email": email, "cf-turnstile-response": "token"})
 
-    assert response.status_code == 200
-    assert response.content == b"Signing request has been sent"
+    assert response.status_code == 302
+    assert response.url == settings.ICLA_SUBMISSION_SUCCESS_URL
     mock_verify_turnstile_token.assert_called_once()
     mock_create_submission.assert_not_called()
     assert ICLA.objects.count() == 1

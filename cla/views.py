@@ -10,6 +10,7 @@ from django.http import FileResponse
 from django.http import HttpRequest
 from django.http import HttpResponse
 from django.http import HttpResponseBadRequest
+from django.http import HttpResponseRedirect
 from django.http import JsonResponse
 from django.middleware.csrf import get_token
 from django.views.decorators.csrf import csrf_exempt
@@ -90,7 +91,7 @@ def send_icla_signing_request(request: HttpRequest) -> HttpResponse:
         icla.create_docuseal_submission()
     else:
         logger.warning("%s has already signed ICLA", email)
-    return HttpResponse("Signing request has been sent")
+    return HttpResponseRedirect(settings.ICLA_SUBMISSION_SUCCESS_URL)
 
 
 def make_submission_data_map(submitter_values: list[dict[str, str]]) -> dict[str, str]:

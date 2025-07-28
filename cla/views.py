@@ -156,6 +156,8 @@ def handle_icla_submission_completed_webhook(request: HttpRequest) -> HttpRespon
     icla.signed_at = submitter["completed_at"]
     icla.telephone = submission_data["Telephone"]
     icla.save()
+    if icla.signed_at:
+        icla.send_notification()
     return HttpResponse("ok")
 
 

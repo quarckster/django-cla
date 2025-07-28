@@ -278,3 +278,60 @@ def test_handle_icla_submission_completed_webhook_empty_mailing_address2(mocker:
     assert icla.mailing_address == "123 Test St"
     assert icla.signed_at == FIXED_NOW
     assert icla.country == "USA"
+
+
+@pytest.mark.django_db
+def test_send_notification_called_only_via_icla_webhook(mocker: MockerFixture, client: Client):
+    """
+    send_notification() should be invoked exactly once when the webhook handler
+    processes a completed ICLA submission.
+    """
+
+    mocker.patch("cla.models.download_document")
+    mock_notify = mocker.patch.object(ICLA, "send_notification")
+
+    email = "notify@example.com"
+    ICLA.objects.create(email=email)
+
+    payload = {
+        "event_type": "submission.completed",
+        "timestamp": FIXED_NOW.isoformat(),
+        "data": {
+            "id": 999,
+            "submitters": [
+                {
+                    "email": email,
+                    "completed_at": FIXED_NOW.isoformat(),
+                    "values": [
+                        {"field": "Full Name", "value": "Notify User"},
+                        {"field": "Public Name", "value": ""},
+                        {"field": "Mailing Address 1", "value": "1 Test Rd"},
+                        {"field": "Mailing Address 2", "value": ""},
+                        {"field": "Country", "value": "Testland"},
+                        {"field": "Telephone", "value": "000"},
+                        {"field": "Email", "value": email},
+                    ],
+                }
+            ],
+        },
+    }
+
+    response = client.post(reverse("webhooks-icla"), json.dumps(payload), content_type="application/json")
+    assert response.status_code == 200
+    mock_notify.assert_called_once()
+
+
+@pytest.mark.django_db
+def test_model_save_does_not_trigger_send_notification(mocker: MockerFixture, client: Client):
+    """
+    Plain .save() on the ICLA model (e.g. in the admin) must never call send_notification().
+    """
+    mock_notify = mocker.patch.object(ICLA, "send_notification")
+
+    icla = ICLA.objects.create(email="adminsave@example.com")
+    icla.full_name = "Admin Saved"
+    icla.employer_approved_at = FIXED_NOW
+    icla.signed_at = FIXED_NOW
+    icla.save()
+
+    mock_notify.assert_not_called()

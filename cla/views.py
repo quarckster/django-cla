@@ -145,10 +145,12 @@ def handle_icla_submission_completed_webhook(request: HttpRequest) -> HttpRespon
     icla.docuseal_submission_id = payload["data"]["id"]
     icla.email = submission_data["Email"]
     icla.full_name = submission_data["Full Name"]
-    icla.mailing_address = submission_data["Mailing Address 1"] + submission_data["Mailing Address 2"]
-    icla.public_name = submission_data["Public Name"]
+    mailing_address_1 = submission_data["Mailing Address 1"] or ""
+    mailing_address_2 = submission_data["Mailing Address 2"] or ""
+    icla.mailing_address = mailing_address_1 + mailing_address_2
+    icla.public_name = submission_data["Public Name"] or ""
     icla.signed_at = submitter["completed_at"]
-    icla.telephone = submission_data["Telephone"]
+    icla.telephone = submission_data["Telephone"] or ""
     icla.save()
     if icla.signed_at:
         icla.send_notification()

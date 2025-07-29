@@ -247,7 +247,7 @@ def test_handle_icla_submission_completed_webhook_empty_mailing_address2(mocker:
                     "completed_at": "2025-06-25T13:45:31.892Z",
                     "values": [
                         {"field": "Full Name", "value": "Test User"},
-                        {"field": "Public Name", "value": ""},
+                        {"field": "Public Name", "value": None},
                         {"field": "Mailing Address 1", "value": "123 Test St"},
                         {"field": "Mailing Address 2", "value": ""},
                         {"field": "Country", "value": "USA"},

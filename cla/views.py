@@ -12,9 +12,7 @@ from django.http import HttpResponse
 from django.http import HttpResponseBadRequest
 from django.http import HttpResponseRedirect
 from django.http import JsonResponse
-from django.middleware.csrf import get_token
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST
 from django.views.decorators.http import require_safe
 
@@ -48,12 +46,6 @@ ICLA_EXPECTED_FIELDS = [
 ]
 
 
-@ensure_csrf_cookie
-@require_safe
-def get_csrf_token(request: HttpRequest) -> JsonResponse:
-    return JsonResponse({"csrfToken": get_token(request)})
-
-
 def verify_turnstile_token(request: HttpRequest) -> bool:
     logger.info("Verify Turnstile token")
     resp = requests.post(
@@ -70,6 +62,7 @@ def verify_turnstile_token(request: HttpRequest) -> bool:
 
 
 @require_POST
+@csrf_exempt
 def send_icla_signing_request(request: HttpRequest) -> HttpResponse:
     form = ICLASigningRequestForm(request.POST)
     if not form.is_valid():

@@ -26,12 +26,6 @@ def set_settings(settings: settings):
     settings.ICLA_SUBMISSION_SUCCESS_URL = "https://example.com/success/"
 
 
-def test_get_csrf_token(client: Client):
-    response = client.get(reverse("csrf"))
-    assert response.status_code == 200
-    assert response.content
-
-
 @pytest.mark.django_db
 @pytest.mark.parametrize(
     "fields",

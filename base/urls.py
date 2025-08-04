@@ -22,6 +22,6 @@ urlpatterns = [
         handle_icla_submission_completed_webhook,
         name="webhooks-icla",
     ),
-    path("admin/", admin.site.urls),
+    path(f"admin/{settings.ADMIN_SECRET_SLUG}/", admin.site.urls),
     path("media/<str:cla_type>/<str:file_name>/", get_cla_pdf, name="media-cla_type-file_name"),
 ]

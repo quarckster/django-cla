@@ -140,10 +140,10 @@ def handle_icla_submission_completed_webhook(request: HttpRequest) -> HttpRespon
         msg = "Missing expected fields: %s", ", ".join(diff)
         logger.error(msg)
         return HttpResponseBadRequest(msg)
-    icla = ICLA.objects.get(email=submission_data["Email"])
+    icla = ICLA.objects.get(email=submission_data["Email"].lower())
     icla.country = submission_data["Country"]
     icla.docuseal_submission_id = payload["data"]["id"]
-    icla.email = submission_data["Email"]
+    icla.email = submission_data["Email"].lower()
     icla.full_name = submission_data["Full Name"]
     mailing_address_1 = submission_data["Mailing Address 1"] or ""
     mailing_address_2 = submission_data["Mailing Address 2"] or ""

@@ -81,10 +81,12 @@ class ICLA(models.Model):
         super().save(**kwargs)
 
     @property
+    @admin.display(boolean=True)
     def is_volunteer(self) -> bool:
         return not bool(self.point_of_contact)
 
     @property
+    @admin.display(boolean=True)
     def is_active(self) -> bool:
         if not self.is_volunteer and bool(self.employer_approved_at) and bool(self.signed_at):
             return True

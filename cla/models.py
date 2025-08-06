@@ -47,7 +47,7 @@ class ICLA(models.Model):
     signed_at = models.DateTimeField(blank=True, null=True)
     telephone = models.CharField(blank=True, max_length=255)
 
-    @admin.display
+    @admin.display(ordering="signed_at")
     def signed_date(self):
         return self.signed_at.date()
 

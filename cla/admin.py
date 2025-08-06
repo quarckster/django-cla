@@ -15,3 +15,4 @@ admin.site.register(CCLA)
 @admin.register(ICLA)
 class ICLAModelAdmin(admin.ModelAdmin):
     list_display = ("email", "full_name", "signed_date", "is_volunteer", "is_active")
+    ordering = ["-signed_at"]

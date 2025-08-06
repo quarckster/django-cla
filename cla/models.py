@@ -4,6 +4,7 @@ from pathlib import Path
 
 import requests
 from django.conf import settings
+from django.contrib import admin
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
 from django.db import models
@@ -45,6 +46,10 @@ class ICLA(models.Model):
     public_name = models.CharField(blank=True, max_length=255)
     signed_at = models.DateTimeField(blank=True, null=True)
     telephone = models.CharField(blank=True, max_length=255)
+
+    @admin.display
+    def signed_date(self):
+        return self.signed_at.date()
 
     def create_docuseal_submission(self) -> None:
         logger.info("Create ICLA Docuseal submission for %s", self.email)

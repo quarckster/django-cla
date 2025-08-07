@@ -1,3 +1,4 @@
+import datetime
 import logging
 import uuid
 from pathlib import Path
@@ -48,8 +49,8 @@ class ICLA(models.Model):
     telephone = models.CharField(blank=True, max_length=255)
 
     @admin.display(ordering="signed_at")
-    def signed_date(self):
-        return self.signed_at.date()
+    def signed_date(self) -> datetime.date | None:
+        return self.signed_at.date() if self.signed_at else None
 
     def create_docuseal_submission(self) -> None:
         logger.info("Create ICLA Docuseal submission for %s", self.email)

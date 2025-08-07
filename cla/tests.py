@@ -5,6 +5,7 @@ from typing import Any
 
 import pytest
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.test import Client
 from django.urls import reverse
 from pytest_mock import MockerFixture
@@ -24,6 +25,13 @@ def set_settings(settings: settings):
     settings.ICLA_WEBHOOK_SECRET_SLUG = "test_secret_slug"
     settings.CCLA_WEBHOOK_SECRET_SLUG = "test_secret_slug"
     settings.ICLA_SUBMISSION_SUCCESS_URL = "https://example.com/success/"
+
+
+@pytest.fixture()
+def setup_superuser():
+    User = get_user_model()
+    if not User.objects.filter(is_superuser=True).exists():
+        User.objects.create_superuser("admin", "admin@example.com", "password123")
 
 
 @pytest.mark.django_db
@@ -62,6 +70,7 @@ def test_get_icla_status_active(client: Client, fields: dict[str, Any]):
 
 
 @pytest.mark.django_db
+@pytest.mark.usefixtures("setup_superuser")
 @pytest.mark.parametrize("payload", [{"point_of_contact": "user@example.com"}, {}], ids=["with-poc", "without-poc"])
 def test_send_signing_request_icla_new_email(
     mocker: MockerFixture, settings: settings, client: Client, payload: dict[str, str]
@@ -96,6 +105,14 @@ def test_send_signing_request_icla_new_email(
     mock_send_mail.assert_not_called()
     mock_download_document.assert_not_called()
     assert ICLA.objects.get(email=email).point_of_contact == payload.get("point_of_contact", "")
+
+    admin_login = client.login(username="admin", password="password123")
+    assert admin_login, "Failed to login as admin for admin site test"
+
+    icla_admin_url = reverse("admin:cla_icla_changelist")
+    admin_response = client.get(icla_admin_url)
+    assert admin_response.status_code == 200
+    assert b"ICLA" in admin_response.content
 
 
 @pytest.mark.django_db

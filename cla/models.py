@@ -89,9 +89,9 @@ class ICLA(models.Model):
     @property
     @admin.display(boolean=True)
     def is_active(self) -> bool:
-        if not self.is_volunteer and bool(self.employer_approved_at) and bool(self.signed_at):
+        if not self.is_volunteer and bool(self.employer_approved_at) and bool(self.cla_pdf):
             return True
-        if self.is_volunteer and bool(self.signed_at):
+        if self.is_volunteer and bool(self.cla_pdf):
             return True
         return False
 

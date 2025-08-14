@@ -56,8 +56,8 @@ def test_get_icla_status_not_active(client: Client, fields: dict[str, Any]):
 @pytest.mark.parametrize(
     "fields",
     [
-        {"point_of_contact": "user@example.com", "employer_approved_at": FIXED_NOW, "signed_at": FIXED_NOW},
-        {"signed_at": FIXED_NOW},
+        {"point_of_contact": "user@example.com", "employer_approved_at": FIXED_NOW, "cla_pdf": "ICLA/some.pdf"},
+        {"cla_pdf": "ICLA/some.pdf"},
     ],
     ids=["employee", "volunteer"],
 )

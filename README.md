@@ -58,25 +58,25 @@ Use the helper script to apply migrations and start the application:
 This runs migrations and launches Gunicorn on `0.0.0.0:8080`. For a pure Django workflow, you can also use:
 
 ```bash
-python manage.py migrate
-python manage.py runserver
+./cla-app.sh manage.py migrate
+./cla-app.sh manage.py runserver
 ```
 
 ### Running Tests
 
 ```bash
-pytest
+./cla-app.sh pytest
 ```
 
 Dev dependencies include `pytest-django`, `pytest-mock`, and `pudb` for debugging.
 
-## Docker
+## Container
 
 Build and run using the provided `Containerfile`:
 
 ```bash
-docker build -t django-cla-app .
-docker run -e SECRET_KEY=... \
+podman build -t django-cla-app .
+podman run -e SECRET_KEY=... \
            -e CCLA_WEBHOOK_SECRET_SLUG=... \
            -e ICLA_WEBHOOK_SECRET_SLUG=... \
            -e CLOUDFLARE_TURNSTILE_SECRET_KEY=... \

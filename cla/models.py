@@ -43,7 +43,7 @@ class ICLA(models.Model):
     full_name = models.CharField(max_length=255)
     mailing_address = models.CharField(blank=True, max_length=255)
     point_of_contact = models.EmailField(blank=True)
-    ccla_manager = models.ForeignKey(User, on_delete=models.PROTECT, blank=True, null=True, verbose_name="CCLA manager")
+    ccla = models.ForeignKey("CCLA", on_delete=models.SET_NULL, blank=True, null=True, verbose_name="CCLA")
     public_name = models.CharField(blank=True, max_length=255)
     signed_at = models.DateTimeField(blank=True, null=True)
     telephone = models.CharField(blank=True, max_length=255)

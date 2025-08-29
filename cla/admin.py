@@ -2,6 +2,7 @@ from django.conf import settings
 from django.contrib import admin
 
 from .models import CCLA
+from .models import CCLAAttachment
 from .models import ICLA
 
 
@@ -9,10 +10,33 @@ admin.site.site_header = settings.ADMIN_SITE_HEADER
 admin.site.site_title = settings.ADMIN_SITE_TITLE
 admin.site.index_title = settings.ADMIN_SITE_INDEX_TITLE
 
-admin.site.register(CCLA)
-
 
 @admin.register(ICLA)
 class ICLAModelAdmin(admin.ModelAdmin):
     list_display = ("email", "full_name", "signed_date", "is_volunteer", "is_active")
+    ordering = ["-signed_at"]
+
+
+class CCLAFileInline(admin.TabularInline):
+    model = CCLAAttachment
+    fields = ("file",)
+    extra = 1
+    min_num = 0
+    can_delete = True
+
+
+class ICLAInline(admin.TabularInline):
+    model = ICLA
+    extra = 0
+    fields = ("full_name", "email")
+    ordering = ["-signed_at"]
+    readonly_fields = ("full_name", "email")
+    show_change_link = True
+    can_delete = False
+
+
+@admin.register(CCLA)
+class CCLAAdmin(admin.ModelAdmin):
+    inlines = [ICLAInline, CCLAFileInline]
+    list_display = ("corporation_name", "signed_date")
     ordering = ["-signed_at"]

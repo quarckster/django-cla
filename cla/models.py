@@ -15,8 +15,12 @@ from docuseal import docuseal
 logger = logging.getLogger(__name__)
 
 
-def cla_file_name(cla: "CCLA | ICLA", filename: str = "") -> str:
-    return f"{type(cla).__name__}/{cla.id}.pdf"
+def cla_file_name(cla: "ICLA | CCLA", filename: str = "") -> str:
+    return f"ICLA/{cla.id}.pdf" if isinstance(cla, ICLA) else f"CCLA/{cla.id}/{cla.id}.pdf"
+
+
+def ccla_attachment_name(ccla_attachment: "CCLAAttachment", filename: str = "") -> str:
+    return f"CCLA/{ccla_attachment.ccla.id}/{filename}"
 
 
 def download_document(cla: "CCLA | ICLA") -> None:
@@ -96,7 +100,7 @@ class ICLA(models.Model):
         return False
 
     def __str__(self) -> str:
-        return f"{self.email}"
+        return self.email
 
 
 class CCLA(models.Model):
@@ -118,6 +122,10 @@ class CCLA(models.Model):
     signed_at = models.DateTimeField(blank=True, null=True)
     telephone = models.CharField(max_length=255)
 
+    @admin.display(ordering="signed_at")
+    def signed_date(self) -> datetime.date | None:
+        return self.signed_at.date() if self.signed_at else None
+
     def create_docuseal_submission(self) -> None:
         logger.info("Create CCLA Docuseal submission for %s", self.company)
         docuseal.key = settings.DOCUSEAL_KEY
@@ -136,3 +144,19 @@ class CCLA(models.Model):
                 ],
             }
         )
+
+    def __str__(self) -> str:
+        return self.corporation_name
+
+
+class CCLAAttachment(models.Model):
+    class Meta:
+        verbose_name = "CCLA Attachment"
+        verbose_name_plural = "CCLA Attachments"
+
+    ccla = models.ForeignKey(CCLA, on_delete=models.CASCADE)
+    file = models.FileField(upload_to=ccla_attachment_name)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return Path(self.file.name).name

@@ -2,7 +2,8 @@ from django.conf import settings
 from django.contrib import admin
 from django.urls import path
 
-from cla.views import get_cla_pdf
+from cla.views import get_ccla_pdf
+from cla.views import get_icla_pdf
 from cla.views import get_icla_status
 from cla.views import handle_ccla_submission_completed_webhook
 from cla.views import handle_icla_submission_completed_webhook
@@ -23,5 +24,6 @@ urlpatterns = [
         name="webhooks-icla",
     ),
     path(f"admin/{settings.ADMIN_SECRET_SLUG}/", admin.site.urls),
-    path("media/<str:cla_type>/<str:file_name>/", get_cla_pdf, name="media-cla_type-file_name"),
+    path("media/ICLA/<str:filename>", get_icla_pdf, name="media-icla-filename"),
+    path("media/CCLA/<str:directory>/<str:filename>", get_ccla_pdf, name="media-ccla-directory-filename"),
 ]

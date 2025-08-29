@@ -26,4 +26,4 @@ RUN uv sync --locked --no-dev
 ENV DJANGO_DEBUG="false" \
     GUNICORN_CMD_ARGS="--bind=0.0.0.0:8080 --workers=2"
 
-CMD ["./cla-app.sh", "migrate-and-run"]
+CMD ["./run.sh"]

@@ -51,21 +51,21 @@ ADMIN_SITE_INDEX_TITLE
 
 Use the helper script to apply migrations and start the application:
 
-```bash
-./cla-app.sh migrate-and-run
+```sh
+./run.sh
 ```
 
 This runs migrations and launches Gunicorn on `0.0.0.0:8080`. For a pure Django workflow, you can also use:
 
-```bash
-./cla-app.sh manage.py migrate
-./cla-app.sh manage.py runserver
+```sh
+./manage.py migrate
+./manage.py runserver
 ```
 
 ### Running Tests
 
-```bash
-./cla-app.sh pytest
+```sh
+./pytest.sh
 ```
 
 Dev dependencies include `pytest-django`, `pytest-mock`, and `pudb` for debugging.
@@ -74,7 +74,7 @@ Dev dependencies include `pytest-django`, `pytest-mock`, and `pudb` for debuggin
 
 Build and run using the provided `Containerfile`:
 
-```bash
+```sh
 podman build -t django-cla-app .
 podman run -e SECRET_KEY=... \
            -e CCLA_WEBHOOK_SECRET_SLUG=... \

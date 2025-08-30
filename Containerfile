@@ -19,7 +19,7 @@ ENV PATH="$PATH:/home/cla/.local/bin"
 
 COPY base/ ./base/
 COPY cla/ ./cla/
-COPY pyproject.toml uv.lock manage.py cla-app.sh ./
+COPY pyproject.toml uv.lock manage.py run.sh ./
 
 RUN uv sync --locked --no-dev
 

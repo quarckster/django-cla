@@ -43,7 +43,7 @@ class ICLA(models.Model):
     docuseal_submission_id = models.IntegerField(blank=True, null=True)
     cla_pdf = models.FileField("CLA pdf", upload_to=cla_file_name)
     email = models.EmailField(unique=True, db_index=True)
-    in_schedule_a = models.BooleanField(default=False)
+    in_schedule_a = models.BooleanField(default=False, verbose_name="In Schedule A")
     full_name = models.CharField(max_length=255)
     mailing_address = models.CharField(blank=True, max_length=255)
     point_of_contact = models.EmailField(blank=True)

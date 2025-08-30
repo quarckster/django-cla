@@ -43,7 +43,7 @@ class ICLA(models.Model):
     docuseal_submission_id = models.IntegerField(blank=True, null=True)
     cla_pdf = models.FileField("CLA pdf", upload_to=cla_file_name)
     email = models.EmailField(unique=True, db_index=True)
-    employer_approved_at = models.DateTimeField(blank=True, null=True)
+    in_schedule_a = models.BooleanField(default=False)
     full_name = models.CharField(max_length=255)
     mailing_address = models.CharField(blank=True, max_length=255)
     point_of_contact = models.EmailField(blank=True)
@@ -88,12 +88,12 @@ class ICLA(models.Model):
     @property
     @admin.display(boolean=True)
     def is_volunteer(self) -> bool:
-        return not bool(self.point_of_contact)
+        return not bool(self.point_of_contact) or not bool(self.ccla)
 
     @property
     @admin.display(boolean=True)
     def is_active(self) -> bool:
-        if not self.is_volunteer and bool(self.employer_approved_at) and bool(self.cla_pdf):
+        if not self.is_volunteer and self.in_schedule_a and bool(self.cla_pdf):
             return True
         if self.is_volunteer and bool(self.cla_pdf):
             return True

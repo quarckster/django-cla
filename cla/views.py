@@ -168,8 +168,8 @@ def get_icla_status(request: HttpRequest, email: str) -> JsonResponse:
 
 @require_safe
 @login_required
-def get_icla_pdf(request: HttpRequest, cla_type: str, filename: str) -> HttpResponse:
-    path = settings.MEDIA_ROOT / cla_type / filename
+def get_icla_pdf(request: HttpRequest, filename: str) -> HttpResponse:
+    path = settings.MEDIA_ROOT / "ICLA" / filename
     return FileResponse(open(path, "rb"))
 
 

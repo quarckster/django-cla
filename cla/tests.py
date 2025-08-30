@@ -1,6 +1,8 @@
 import json
+import uuid
 from datetime import datetime
 from datetime import timezone
+from pathlib import Path
 from typing import Any
 
 import pytest
@@ -38,11 +40,11 @@ def setup_superuser():
 @pytest.mark.parametrize(
     "fields",
     [
-        {"point_of_contact": "user@example.com", "employer_approved_at": FIXED_NOW},
+        {"point_of_contact": "user@example.com", "in_schedule_a": True},
         {"point_of_contact": "user@example.com", "signed_at": FIXED_NOW},
         {},
     ],
-    ids=["employee-not-signed", "employee-not-approved", "volunteer-not-signed"],
+    ids=["employee-not-signed", "employee-not-in-schedule-a", "volunteer-not-signed"],
 )
 def test_get_icla_status_not_active(client: Client, fields: dict[str, Any]):
     email = "test@example.com"
@@ -56,7 +58,7 @@ def test_get_icla_status_not_active(client: Client, fields: dict[str, Any]):
 @pytest.mark.parametrize(
     "fields",
     [
-        {"point_of_contact": "user@example.com", "employer_approved_at": FIXED_NOW, "cla_pdf": "ICLA/some.pdf"},
+        {"point_of_contact": "user@example.com", "in_schedule_a": True, "cla_pdf": "ICLA/some.pdf"},
         {"cla_pdf": "ICLA/some.pdf"},
     ],
     ids=["employee", "volunteer"],
@@ -347,3 +349,105 @@ def test_model_save_does_not_trigger_send_notification(mocker: MockerFixture, cl
     icla.save()
 
     mock_notify.assert_not_called()
+
+
+@pytest.mark.django_db
+def test_send_signing_request_icla_turnstile_fails(mocker: MockerFixture, client: Client):
+    """
+    Test that the signing request is rejected if Turnstile verification fails.
+    """
+    mock_verify_turnstile_token = mocker.patch("cla.views.verify_turnstile_token", return_value=False)
+    email = "new_contributor@example.com"
+    response = client.post(reverse("icla-submit"), {"email": email, "cf-turnstile-response": "token"})
+
+    assert response.status_code == 400
+    assert response.content == b"Turnstile token verification failed"
+    mock_verify_turnstile_token.assert_called_once()
+    assert not ICLA.objects.filter(email=email).exists()
+
+
+@pytest.mark.django_db
+@pytest.mark.usefixtures("setup_superuser")
+def test_ccla_admin_page_loads_with_inlines(client: Client):
+    """
+    Test that the CCLA admin page and its inlines load successfully for a superuser.
+    """
+    User = get_user_model()
+    manager = User.objects.create_user("manager", "manager@example.com", "password")
+    ccla = CCLA.objects.create(
+        corporation_name="Test Corp", ccla_manager=manager, authorized_signer_email="signer@example.com"
+    )
+    ICLA.objects.create(email="employee@testcorp.com", ccla=ccla)
+
+    client.login(username="admin", password="password123")
+    admin_url = reverse("admin:cla_ccla_change", args=(ccla.id,))
+    response = client.get(admin_url)
+
+    assert response.status_code == 200
+    assert b"Test Corp" in response.content
+    # Check for inline content
+    assert b"employee@testcorp.com" in response.content
+    assert b"CCLA Attachments" in response.content
+
+
+@pytest.mark.django_db
+@pytest.mark.usefixtures("setup_superuser")
+def test_pdf_views_require_login(client: Client):
+    """
+    Test that accessing PDF download views without being logged in redirects to the login page.
+    """
+    icla_url = reverse("media-icla-filename", args=("some.pdf",))
+    ccla_url = reverse("media-ccla-directory-filename", args=("some_dir", "some.pdf"))
+
+    icla_response = client.get(icla_url)
+    ccla_response = client.get(ccla_url)
+
+    assert icla_response.status_code == 302
+    assert icla_response.url.startswith("/accounts/login/?next=/media/ICLA/some.pdf")
+    assert ccla_response.status_code == 302
+    assert ccla_response.url.startswith("/accounts/login/?next=/media/CCLA/some_dir/some.pdf")
+
+
+@pytest.mark.django_db
+@pytest.mark.usefixtures("setup_superuser")
+def test_get_pdf_views_authenticated(client: Client, settings: settings):
+    """
+    Test that a logged-in user can successfully access the PDF files.
+    """
+    media_root = Path(settings.MEDIA_ROOT)
+    icla_dir = media_root / "ICLA"
+    icla_dir.mkdir(parents=True, exist_ok=True)
+    (icla_dir / "test.pdf").write_text("ICLA content")
+
+    ccla_dir = media_root / "CCLA" / "test_dir"
+    ccla_dir.mkdir(parents=True, exist_ok=True)
+    (ccla_dir / "test.pdf").write_text("CCLA content")
+
+    client.login(username="admin", password="password123")
+
+    # Test ICLA PDF view
+    icla_url = reverse("media-icla-filename", args=("test.pdf",))
+    icla_response = client.get(icla_url)
+    assert icla_response.status_code == 200
+
+    # Test CCLA PDF view
+    ccla_url = reverse("media-ccla-directory-filename", args=("test_dir", "test.pdf"))
+    ccla_response = client.get(ccla_url)
+    assert ccla_response.status_code == 200
+
+
+def test_cla_file_name_helper():
+    """
+    Test the cla_file_name helper function for correct path generation.
+    """
+    from cla.models import cla_file_name
+
+    icla_id = uuid.uuid4()
+    ccla_id = uuid.uuid4()
+
+    # Mock model instances
+    icla_instance = ICLA(id=icla_id)
+    ccla_instance = CCLA(id=ccla_id)
+
+    assert cla_file_name(icla_instance) == f"ICLA/{icla_id}.pdf"
+    assert cla_file_name(ccla_instance) == f"CCLA/{ccla_id}/{ccla_id}.pdf"

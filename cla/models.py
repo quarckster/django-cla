@@ -38,7 +38,7 @@ class ICLA(models.Model):
         verbose_name = "ICLA"
         verbose_name_plural = "ICLAs"
 
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(primary_key=True, editable=False)
     country = models.CharField(blank=True, max_length=255)
     docuseal_submission_id = models.IntegerField(blank=True, null=True)
     cla_pdf = models.FileField("CLA pdf", upload_to=cla_file_name)
@@ -80,6 +80,8 @@ class ICLA(models.Model):
         )
 
     def save(self, **kwargs) -> None:
+        if not self.pk:
+            self.id = uuid.uuid4()
         if not self.cla_pdf and self.docuseal_submission_id:
             download_document(self)
             self.cla_pdf = cla_file_name(self)
@@ -108,7 +110,7 @@ class CCLA(models.Model):
         verbose_name = "CCLA"
         verbose_name_plural = "CCLAs"
 
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(primary_key=True, editable=False)
     authorized_signer_email = models.EmailField(blank=True)
     authorized_signer_name = models.CharField(blank=True, max_length=255)
     authorized_signer_title = models.CharField(blank=True, max_length=255)
@@ -146,6 +148,8 @@ class CCLA(models.Model):
         )
 
     def save(self, **kwargs) -> None:
+        if not self.pk:
+            self.id = uuid.uuid4()
         if not self.cla_pdf and self.docuseal_submission_id:
             download_document(self)
             self.cla_pdf = cla_file_name(self)

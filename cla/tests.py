@@ -168,10 +168,11 @@ def test_send_signing_request_icla_invalid_email(client: Client):
 
 
 @pytest.mark.django_db
-def test_handle_ccla_submission_completed_webhook_success(client: Client):
+def test_handle_ccla_submission_completed_webhook_success(mocker: MockerFixture, client: Client):
     """
     Test that a valid webhook payload successfully creates an CCLA object.
     """
+    mock_download_document = mocker.patch("cla.models.download_document")
     payload = {
         "event_type": "submission.completed",
         "timestamp": "2025-06-25T13:45:33.140Z",
@@ -202,6 +203,7 @@ def test_handle_ccla_submission_completed_webhook_success(client: Client):
 
     assert response.status_code == 200
     assert response.content == b"ok"
+    mock_download_document.assert_called_once()
 
     ccla = CCLA.objects.get(corporation_name="Company")
     assert ccla.authorized_signer_email == "john.doe@example.com"
@@ -451,3 +453,90 @@ def test_cla_file_name_helper():
 
     assert cla_file_name(icla_instance) == f"ICLA/{icla_id}.pdf"
     assert cla_file_name(ccla_instance) == f"CCLA/{ccla_id}/{ccla_id}.pdf"
+
+
+@pytest.mark.django_db
+@pytest.mark.usefixtures("setup_superuser")
+def test_ccla_admin_save_without_changes(mocker: MockerFixture, client: Client):
+    """
+    Test that opening an existing CCLA in the admin and saving it without
+    any changes does not cause an IntegrityError. This simulates the bug fix.
+    """
+    mocker.patch("cla.models.download_document")
+    User = get_user_model()
+    manager = User.objects.create_user("ccla_manager", "manager@corp.com", "password")
+    ccla = CCLA.objects.create(
+        corporation_name="Bug Corp",
+        ccla_manager=manager,
+        authorized_signer_email="signer@corp.com",
+        docuseal_submission_id=98765,
+    )
+    assert CCLA.objects.count() == 1
+
+    client.login(username="admin", password="password123")
+    admin_url = reverse("admin:cla_ccla_change", args=(ccla.id,))
+
+    post_data = {
+        "corporation_name": "Bug Corp",
+        "ccla_manager": manager.id,
+        "authorized_signer_email": "signer@corp.com",
+        "authorized_signer_name": "",
+        "authorized_signer_title": "",
+        "corporation_address": "",
+        "corporation_alias": "",
+        "docuseal_submission_id": "98765",
+        "fax": "",
+        "signed_at_0": "",  # Date part of DateTimeField
+        "signed_at_1": "",  # Time part of DateTimeField
+        "telephone": "",
+        # Management form for ICLA inline
+        "icla_set-TOTAL_FORMS": "0",
+        "icla_set-INITIAL_FORMS": "0",
+        # Management form for CCLAAttachment inline (extra=1)
+        "cclaattachment_set-TOTAL_FORMS": "1",
+        "cclaattachment_set-INITIAL_FORMS": "0",
+        "_save": "Save",
+    }
+
+    response = client.post(admin_url, data=post_data)
+
+    assert response.status_code == 302, f"Expected redirect, got {response.status_code}"
+    assert CCLA.objects.count() == 1
+
+
+@pytest.mark.django_db
+@pytest.mark.usefixtures("setup_superuser")
+def test_icla_admin_save_without_changes(mocker: MockerFixture, client: Client):
+    """
+    Test that opening an existing ICLA in the admin and saving it without
+    any changes correctly calls the overriden save method.
+    """
+    mock_download = mocker.patch("cla.models.download_document")
+    email = "test-admin-save@example.com"
+    icla = ICLA.objects.create(
+        email=email,
+        full_name="Admin Save Test",
+        docuseal_submission_id=112233,
+    )
+    assert ICLA.objects.count() == 1
+    client.login(username="admin", password="password123")
+    admin_url = reverse("admin:cla_icla_change", args=(icla.id,))
+    # This dictionary mimics the form data sent by the browser when saving.
+    # Note: Unchecked boolean fields like 'in_schedule_a' are not sent in the POST data.
+    post_data = {
+        "email": email,
+        "full_name": "Admin Save Test",
+        "docuseal_submission_id": "112233",
+        "country": "",
+        "mailing_address": "",
+        "point_of_contact": "",
+        "public_name": "",
+        "signed_at_0": "",  # Date part of DateTimeField
+        "signed_at_1": "",  # Time part of DateTimeField
+        "telephone": "",
+        "_save": "Save",
+    }
+    response = client.post(admin_url, data=post_data)
+    assert response.status_code == 302, f"Expected redirect, got {response.status_code}"
+    assert ICLA.objects.count() == 1
+    mock_download.assert_called_once()

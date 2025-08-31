@@ -145,6 +145,12 @@ class CCLA(models.Model):
             }
         )
 
+    def save(self, **kwargs) -> None:
+        if not self.cla_pdf and self.docuseal_submission_id:
+            download_document(self)
+            self.cla_pdf = cla_file_name(self)
+        super().save(**kwargs)
+
     def __str__(self) -> str:
         return self.corporation_name
 

@@ -15,6 +15,7 @@ admin.site.index_title = settings.ADMIN_SITE_INDEX_TITLE
 class ICLAModelAdmin(admin.ModelAdmin):
     list_display = ("email", "full_name", "signed_date", "is_volunteer", "is_active")
     ordering = ["-signed_at"]
+    search_fields = ["email", "full_name"]
 
 
 class CCLAFileInline(admin.TabularInline):
@@ -39,4 +40,5 @@ class ICLAInline(admin.TabularInline):
 class CCLAAdmin(admin.ModelAdmin):
     inlines = [ICLAInline, CCLAFileInline]
     list_display = ("corporation_name", "signed_date")
-    ordering = ["-signed_at"]
+    ordering = ["corporation_name"]
+    search_fields = ["corporation_name"]

@@ -39,7 +39,7 @@ class ICLA(models.Model):
         verbose_name_plural = "ICLAs"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    country = models.CharField(max_length=255)
+    country = models.CharField(blank=True, max_length=255)
     docuseal_submission_id = models.IntegerField(blank=True, null=True)
     cla_pdf = models.FileField("CLA pdf", upload_to=cla_file_name)
     email = models.EmailField(unique=True, db_index=True)
@@ -88,7 +88,7 @@ class ICLA(models.Model):
     @property
     @admin.display(boolean=True)
     def is_volunteer(self) -> bool:
-        return not bool(self.point_of_contact) or not bool(self.ccla)
+        return not (bool(self.point_of_contact) or bool(self.ccla))
 
     @property
     @admin.display(boolean=True)
@@ -109,18 +109,18 @@ class CCLA(models.Model):
         verbose_name_plural = "CCLAs"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    authorized_signer_email = models.EmailField(unique=True)
-    authorized_signer_name = models.CharField(max_length=255)
+    authorized_signer_email = models.EmailField(blank=True)
+    authorized_signer_name = models.CharField(blank=True, max_length=255)
     authorized_signer_title = models.CharField(blank=True, max_length=255)
     cla_pdf = models.FileField("CLA pdf", upload_to=cla_file_name)
-    corporation_address = models.CharField(max_length=255)
+    corporation_address = models.CharField(blank=True, max_length=255)
     corporation_alias = models.CharField(blank=True, max_length=255)
     corporation_name = models.CharField(unique=True, max_length=255)
     docuseal_submission_id = models.IntegerField(blank=True, null=True)
     fax = models.CharField(blank=True, max_length=255)
     ccla_manager = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name="CCLA manager")
     signed_at = models.DateTimeField(blank=True, null=True)
-    telephone = models.CharField(max_length=255)
+    telephone = models.CharField(blank=True, max_length=255)
 
     @admin.display(ordering="signed_at")
     def signed_date(self) -> datetime.date | None:

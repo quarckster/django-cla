@@ -1,5 +1,6 @@
 from django.db.backends.mysql.base import DatabaseWrapper as MySQLDatabaseWrapper
 from google.cloud.sql.connector import Connector
+from pymysql.constants import CLIENT
 
 
 class DatabaseWrapper(MySQLDatabaseWrapper):
@@ -18,4 +19,6 @@ class DatabaseWrapper(MySQLDatabaseWrapper):
             "pymysql",
             user=conn_params["user"],
             db=conn_params["database"],
+            # this is required to Django correctly defines when to use UPDATE in the sql
+            client_flag=CLIENT.FOUND_ROWS,
         )

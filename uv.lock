@@ -1,5 +1,5 @@
 version = 1
-revision = 2
+revision = 3
 requires-python = ">=3.11"
 
 [[package]]
@@ -274,13 +274,13 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "cloud-sql-python-connector", extras = ["pymysql"], specifier = ">=1.18.3" },
+    { name = "cloud-sql-python-connector", extras = ["pymysql"], specifier = ">=1.18.4" },
     { name = "django", specifier = ">=5.2.3" },
     { name = "django-cors-headers", specifier = ">=4.7.0" },
     { name = "docuseal", specifier = ">=1.0.7" },
     { name = "dynaconf", extras = ["yaml"], specifier = ">=3.2.11" },
     { name = "gunicorn", specifier = ">=23.0.0" },
-    { name = "pymysql", specifier = ">=1.1.1" },
+    { name = "pymysql", specifier = ">=1.1.2" },
     { name = "requests", specifier = ">=2.32.4" },
 ]
 
@@ -295,7 +295,7 @@ dev = [
 
 [[package]]
 name = "cloud-sql-python-connector"
-version = "1.18.3"
+version = "1.18.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiofiles" },
@@ -305,9 +305,9 @@ dependencies = [
     { name = "google-auth" },
     { name = "requests" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/b6/4f/97498f9ac19c80801a4c6a007b857bad3f50f671a0a486c669c98372e74f/cloud_sql_python_connector-1.18.3.tar.gz", hash = "sha256:1c50bfbcdf27f19be0389f0c088791c0cb8fdf8581974291dc3b155bb97f49cc", size = 42669, upload-time = "2025-07-11T22:09:28.925Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/f7/b8/575145a7b58b57dfb347f4397a23efaf14001ff2d37d4ca71f1bcfc52881/cloud_sql_python_connector-1.18.4.tar.gz", hash = "sha256:dd2b015245d77771b5e7566e2817e279e9daca90e0cf30dac032155e813afe76", size = 42652, upload-time = "2025-08-12T21:27:30.386Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/3c/bd/f8a05c5380d428c8cf9d8aeb8ed449d8f70b10bd218d0ee1d48f41586227/cloud_sql_python_connector-1.18.3-py3-none-any.whl", hash = "sha256:4f0f7722ee5de26c0322589038c6aa5839f40a23cd57ac4cadde231da5ba3ba4", size = 49276, upload-time = "2025-07-11T22:09:27.766Z" },
+    { url = "https://files.pythonhosted.org/packages/00/45/ad1e5b214037e5ec095e8b3b2082d61653f10b862b9542a99f993d31f8b4/cloud_sql_python_connector-1.18.4-py3-none-any.whl", hash = "sha256:0a77a16ab2d93fc78d8593175cb69fedfbc1c67aa99f9b3ba70b5026343db092", size = 49276, upload-time = "2025-08-12T21:27:29.054Z" },
 ]
 
 [package.optional-dependencies]
@@ -962,11 +962,11 @@ wheels = [
 
 [[package]]
 name = "pymysql"
-version = "1.1.1"
+version = "1.1.2"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/b3/8f/ce59b5e5ed4ce8512f879ff1fa5ab699d211ae2495f1adaa5fbba2a1eada/pymysql-1.1.1.tar.gz", hash = "sha256:e127611aaf2b417403c60bf4dc570124aeb4a57f5f37b8e95ae399a42f904cd0", size = 47678, upload-time = "2024-05-21T11:03:43.722Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/f5/ae/1fe3fcd9f959efa0ebe200b8de88b5a5ce3e767e38c7ac32fb179f16a388/pymysql-1.1.2.tar.gz", hash = "sha256:4961d3e165614ae65014e361811a724e2044ad3ea3739de9903ae7c21f539f03", size = 48258, upload-time = "2025-08-24T12:55:55.146Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/0c/94/e4181a1f6286f545507528c78016e00065ea913276888db2262507693ce5/PyMySQL-1.1.1-py3-none-any.whl", hash = "sha256:4de15da4c61dc132f4fb9ab763063e693d521a80fd0e87943b9a453dd4c19d6c", size = 44972, upload-time = "2024-05-21T11:03:41.216Z" },
+    { url = "https://files.pythonhosted.org/packages/7c/4c/ad33b92b9864cbde84f259d5df035a6447f91891f5be77788e2a3892bce3/pymysql-1.1.2-py3-none-any.whl", hash = "sha256:e6b1d89711dd51f8f74b1631fe08f039e7d76cf67a42a323d3178f0f25762ed9", size = 45300, upload-time = "2025-08-24T12:55:53.394Z" },
 ]
 
 [[package]]

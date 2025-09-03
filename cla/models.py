@@ -38,7 +38,7 @@ class ICLA(models.Model):
         verbose_name = "ICLA"
         verbose_name_plural = "ICLAs"
 
-    id = models.UUIDField(primary_key=True, editable=False)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     country = models.CharField(blank=True, max_length=255)
     docuseal_submission_id = models.IntegerField(blank=True, null=True)
     cla_pdf = models.FileField("CLA pdf", upload_to=cla_file_name)
@@ -80,8 +80,6 @@ class ICLA(models.Model):
         )
 
     def save(self, **kwargs) -> None:
-        if not self.pk:
-            self.id = uuid.uuid4()
         if not self.cla_pdf and self.docuseal_submission_id:
             download_document(self)
             self.cla_pdf = cla_file_name(self)
@@ -110,7 +108,7 @@ class CCLA(models.Model):
         verbose_name = "CCLA"
         verbose_name_plural = "CCLAs"
 
-    id = models.UUIDField(primary_key=True, editable=False)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     authorized_signer_email = models.EmailField(blank=True)
     authorized_signer_name = models.CharField(blank=True, max_length=255)
     authorized_signer_title = models.CharField(blank=True, max_length=255)
@@ -129,7 +127,7 @@ class CCLA(models.Model):
         return self.signed_at.date() if self.signed_at else None
 
     def create_docuseal_submission(self) -> None:
-        logger.info("Create CCLA Docuseal submission for %s", self.company)
+        logger.info("Create CCLA Docuseal submission for %s", self.corporation_name)
         docuseal.key = settings.DOCUSEAL_KEY
         docuseal.create_submission(
             {
@@ -141,15 +139,13 @@ class CCLA(models.Model):
                         "email": self.ccla_manager.email,
                         "name": f"{self.ccla_manager.first_name} {self.ccla_manager.last_name}",
                         "role": "Authorized Signer",
-                        "values": {"Corporation name": self.company},
+                        "values": {"Corporation name": self.corporation_name},
                     },
                 ],
             }
         )
 
     def save(self, **kwargs) -> None:
-        if not self.pk:
-            self.id = uuid.uuid4()
         if not self.cla_pdf and self.docuseal_submission_id:
             download_document(self)
             self.cla_pdf = cla_file_name(self)

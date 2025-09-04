@@ -29,7 +29,7 @@ class CCLAFileInline(admin.TabularInline):
 class ICLAInline(admin.TabularInline):
     model = ICLA
     extra = 0
-    fields = ("full_name", "email")
+    fields = ("full_name", "email", "in_schedule_a")
     ordering = ["-signed_at"]
     readonly_fields = ("full_name", "email")
     show_change_link = True

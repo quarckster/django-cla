@@ -118,7 +118,7 @@ class CCLA(models.Model):
     corporation_name = models.CharField(unique=True, max_length=255)
     docuseal_submission_id = models.IntegerField(blank=True, null=True)
     fax = models.CharField(blank=True, max_length=255)
-    ccla_manager = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name="CCLA manager")
+    ccla_manager = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="CCLA manager")
     signed_at = models.DateTimeField(blank=True, null=True)
     telephone = models.CharField(blank=True, max_length=255)
 

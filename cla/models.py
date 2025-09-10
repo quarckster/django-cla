@@ -39,18 +39,18 @@ class ICLA(models.Model):
         verbose_name_plural = "ICLAs"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    country = models.CharField(blank=True, max_length=255)
-    docuseal_submission_id = models.IntegerField(blank=True, null=True)
     cla_pdf = models.FileField("CLA pdf", upload_to=cla_file_name)
     email = models.EmailField(unique=True, db_index=True)
-    in_schedule_a = models.BooleanField(default=False, verbose_name="In Schedule A")
     full_name = models.CharField(max_length=255)
+    public_name = models.CharField(blank=True, max_length=255)
     mailing_address = models.CharField(blank=True, max_length=255)
+    country = models.CharField(blank=True, max_length=255)
+    telephone = models.CharField(blank=True, max_length=255)
+    docuseal_submission_id = models.IntegerField(blank=True, null=True)
+    in_schedule_a = models.BooleanField(default=False, verbose_name="In Schedule A")
     point_of_contact = models.EmailField(blank=True)
     ccla = models.ForeignKey("CCLA", on_delete=models.SET_NULL, blank=True, null=True, verbose_name="CCLA")
-    public_name = models.CharField(blank=True, max_length=255)
     signed_at = models.DateTimeField(blank=True, null=True)
-    telephone = models.CharField(blank=True, max_length=255)
 
     @admin.display(ordering="signed_at")
     def signed_date(self) -> datetime.date | None:

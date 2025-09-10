@@ -76,10 +76,11 @@ def send_icla_signing_request(request: HttpRequest) -> HttpResponse:
         return HttpResponseBadRequest("Turnstile token verification failed")
     email = form.cleaned_data["email"]
     point_of_contact = form.cleaned_data["point_of_contact"]
+    is_volunteer = form.cleaned_data.get("is_volunteer", True)
     try:
         ICLA.objects.get(email=email)
     except ICLA.DoesNotExist:
-        icla = ICLA(email=email, point_of_contact=point_of_contact)
+        icla = ICLA(email=email, point_of_contact=point_of_contact, _is_volunteer=is_volunteer)
         icla.save()
         icla.create_docuseal_submission()
     else:

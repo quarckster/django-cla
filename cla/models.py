@@ -88,9 +88,8 @@ class ICLA(models.Model):
 
     @admin.display(boolean=True)
     def is_volunteer(self) -> bool:
-        return not bool(self.ccla) or bool(self._is_volunteer)
+        return not bool(self.ccla) and bool(self._is_volunteer)
 
-    @property
     @admin.display(boolean=True)
     def is_active(self) -> bool:
         if not self.is_volunteer and self.in_schedule_a and bool(self.cla_pdf):

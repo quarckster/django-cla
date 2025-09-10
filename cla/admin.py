@@ -16,6 +16,8 @@ class ICLAModelAdmin(admin.ModelAdmin):
     list_display = ("email", "full_name", "signed_date", "is_volunteer", "is_active")
     ordering = ["-signed_at"]
     search_fields = ["email", "full_name"]
+    readonly_fields = ("is_volunteer",)
+    exclude = ("_is_volunteer",)
 
 
 class CCLAFileInline(admin.TabularInline):

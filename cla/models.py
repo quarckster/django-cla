@@ -46,6 +46,7 @@ class ICLA(models.Model):
     mailing_address = models.CharField(blank=True, max_length=255)
     country = models.CharField(blank=True, max_length=255)
     telephone = models.CharField(blank=True, max_length=255)
+    _is_volunteer = models.BooleanField(null=True, blank=True, verbose_name="Is volunteer")
     docuseal_submission_id = models.IntegerField(blank=True, null=True)
     in_schedule_a = models.BooleanField(default=False, verbose_name="In Schedule A")
     point_of_contact = models.EmailField(blank=True)
@@ -85,10 +86,9 @@ class ICLA(models.Model):
             self.cla_pdf = cla_file_name(self)
         super().save(**kwargs)
 
-    @property
     @admin.display(boolean=True)
     def is_volunteer(self) -> bool:
-        return not (bool(self.point_of_contact) or bool(self.ccla))
+        return not bool(self.ccla) or bool(self._is_volunteer)
 
     @property
     @admin.display(boolean=True)

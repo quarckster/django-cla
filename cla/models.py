@@ -11,7 +11,6 @@ from django.core.mail import send_mail
 from django.db import models
 from docuseal import docuseal
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -51,6 +50,14 @@ class ICLA(models.Model):
     in_schedule_a = models.BooleanField(default=False, verbose_name="In Schedule A")
     point_of_contact = models.EmailField(blank=True)
     ccla = models.ForeignKey("CCLA", on_delete=models.SET_NULL, blank=True, null=True, verbose_name="CCLA")
+    person = models.ForeignKey(
+        "personnel.Person",
+        on_delete=models.SET_NULL,
+        related_name="iclas",
+        null=True,
+        blank=True,
+        verbose_name="Personnel Person",
+    )
     signed_at = models.DateTimeField(blank=True, null=True)
 
     @admin.display(ordering="signed_at")

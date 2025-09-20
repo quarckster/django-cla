@@ -41,6 +41,7 @@ SESSION_COOKIE_SECURE = False
 # Application definition
 
 INSTALLED_APPS = [
+    "personnel.apps.PersonnelConfig",
     "cla.apps.ClaConfig",
     "corsheaders",
     "django.contrib.admin",

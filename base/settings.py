@@ -43,6 +43,7 @@ SESSION_COOKIE_SECURE = False
 INSTALLED_APPS = [
     "personnel.apps.PersonnelConfig",
     "cla.apps.ClaConfig",
+    "api.apps.ApiConfig",
     "corsheaders",
     "django.contrib.admin",
     "django.contrib.auth",

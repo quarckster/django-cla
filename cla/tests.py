@@ -49,9 +49,9 @@ def setup_superuser():
 def test_get_icla_status_not_active(client: Client, fields: dict[str, Any]):
     email = "test@example.com"
     ICLA.objects.create(email=email, **fields)
-    response = client.get(reverse("icla-email-status", args=(email,)))
+    response = client.get(reverse("0-hascla-email", args=(email,)))
     assert response.status_code == 200
-    assert json.loads(response.content) == {"email": email, "active": False}
+    assert json.loads(response.content) == [1]
 
 
 @pytest.mark.django_db
@@ -66,9 +66,9 @@ def test_get_icla_status_not_active(client: Client, fields: dict[str, Any]):
 def test_get_icla_status_active(client: Client, fields: dict[str, Any]):
     email = "test@example.com"
     ICLA.objects.create(email=email, **fields)
-    response = client.get(reverse("icla-email-status", args=(email,)))
+    response = client.get(reverse("0-hascla-email", args=(email,)))
     assert response.status_code == 200
-    assert json.loads(response.content) == {"email": email, "active": True}
+    assert json.loads(response.content) == [1]
 
 
 @pytest.mark.django_db

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import datetime
 import logging
 import uuid
@@ -14,15 +16,15 @@ from docuseal import docuseal
 logger = logging.getLogger(__name__)
 
 
-def cla_file_name(cla: "ICLA | CCLA", filename: str = "") -> str:
+def cla_file_name(cla: ICLA | CCLA, filename: str = "") -> str:
     return f"ICLA/{cla.id}.pdf" if isinstance(cla, ICLA) else f"CCLA/{cla.id}/{cla.id}.pdf"
 
 
-def ccla_attachment_name(ccla_attachment: "CCLAAttachment", filename: str = "") -> str:
+def ccla_attachment_name(ccla_attachment: CCLAAttachment, filename: str = "") -> str:
     return f"CCLA/{ccla_attachment.ccla.id}/{filename}"
 
 
-def download_document(cla: "CCLA | ICLA") -> None:
+def download_document(cla: CCLA | ICLA) -> None:
     docuseal.key = settings.DOCUSEAL_KEY
     docuseal_api_resp = docuseal.get_submission_documents(cla.docuseal_submission_id)
     link = docuseal_api_resp["documents"][0]["url"]

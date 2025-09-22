@@ -11,7 +11,6 @@ from django.http import HttpRequest
 from django.http import HttpResponse
 from django.http import HttpResponseBadRequest
 from django.http import HttpResponseRedirect
-from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.views.decorators.http import require_safe
@@ -156,15 +155,6 @@ def handle_icla_submission_completed_webhook(request: HttpRequest) -> HttpRespon
     if icla.signed_at:
         icla.send_notification()
     return HttpResponse("ok")
-
-
-@require_safe
-def get_icla_status(request: HttpRequest, email: str) -> JsonResponse:
-    try:
-        icla = ICLA.objects.get(email=email)
-        return JsonResponse({"email": email, "active": icla.is_active})
-    except ICLA.DoesNotExist:
-        return JsonResponse({"email": email, "active": False})
 
 
 @require_safe

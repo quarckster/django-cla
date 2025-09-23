@@ -36,7 +36,7 @@ urlpatterns = [
     path("media/ICLA/<str:filename>", get_icla_pdf, name="media-icla-filename"),
     path("media/CCLA/<str:directory>/<str:filename>", get_ccla_pdf, name="media-ccla-directory-filename"),
     path(
-        f"webhooks/icla/{settings.ICLA_WEBHOOK_SECRET_SLUG}/check/",
+        f"webhooks/icla/{settings.CLA_CHECK_WEBHOOK_SECRET_SLUG}/check/",
         handle_github_pull_request_webhook,
         name="webhooks-icla-check",
     ),

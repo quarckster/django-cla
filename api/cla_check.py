@@ -27,7 +27,7 @@ def get_headers(token: str) -> dict[str, str]:
 def remove_label(pr: dict) -> None:
     url = f"{pr['issue_url']}/labels/{quote(CLA_LABEL)}"
     logger.info("Remove label %s", url)
-    r = requests.delete(url, headers=get_headers(settings.GITHUB_COM_TOKEN))
+    r = requests.delete(url, headers=get_headers(settings.GITHUB_API_TOKEN))
     if r.status_code == 404:
         logger.info("Label %s doesn't exist", url)
 
@@ -36,7 +36,7 @@ def add_label(pr: dict) -> None:
     payload = f'[ "{CLA_LABEL}" ]'
     url = f"{pr['issue_url']}/labels"
     logger.info("Add label %s", url)
-    requests.post(url, data=payload, headers=get_headers(settings.GITHUB_COM_TOKEN))
+    requests.post(url, data=payload, headers=get_headers(settings.GITHUB_API_TOKEN))
 
 
 def update_status(pr: dict, state: str, description: str) -> None:
@@ -48,7 +48,7 @@ def update_status(pr: dict, state: str, description: str) -> None:
     }
     url = pr["_links"]["statuses"]["href"]
     logger.info("Update commit status of CLA check: %s, %s, %s", url, state, description)
-    requests.post(url, json=payload, headers=get_headers(settings.GITHUB_COM_TOKEN))
+    requests.post(url, json=payload, headers=get_headers(settings.GITHUB_API_TOKEN))
 
 
 def is_in_cla_db(email: str) -> bool:
@@ -62,7 +62,7 @@ def is_in_cla_db(email: str) -> bool:
 
 
 def get_pr_commits(commits_url: str) -> dict:
-    headers = get_headers(settings.GITHUB_COM_TOKEN)
+    headers = get_headers(settings.GITHUB_API_TOKEN)
     r = requests.get(commits_url, headers=headers)
     return r.json()
 

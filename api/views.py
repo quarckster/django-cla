@@ -1,5 +1,3 @@
-import hashlib
-import hmac
 import json
 
 from django.http import HttpRequest
@@ -11,7 +9,6 @@ from django.views.decorators.http import require_POST
 from django.views.decorators.http import require_safe
 
 from .cla_check import process
-from base import settings
 from cla.models import ICLA
 from personnel.models import Group
 from personnel.models import Person
@@ -31,12 +28,6 @@ NULL_ACTIONS = (
 @require_POST
 @csrf_exempt
 def handle_github_pull_request_webhook(request: HttpRequest) -> HttpResponse:
-    if not (signature_header := request.headers.get("x-hub-signature-256")):
-        return HttpResponseBadRequest("x-hub-signature-256 header is missing.")
-    hash_object = hmac.new(settings.WEBHOOK_SECRET.encode("utf8"), msg=request.body, digestmod=hashlib.sha256)
-    expected_signature = f"sha256={hash_object.hexdigest()}"
-    if not hmac.compare_digest(expected_signature, signature_header):
-        return HttpResponse("Request signatures didn't match.", status_code=401)
     payload = json.loads(request.body)
     if request.headers["X-GitHub-Event"] == "ping":
         return "pong"

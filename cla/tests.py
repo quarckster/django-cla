@@ -20,13 +20,13 @@ FIXED_NOW = datetime(2025, 6, 25, 13, 45, 31, 892000, tzinfo=timezone.utc)
 
 
 @pytest.fixture(autouse=True)
-def set_settings(settings: settings):
-    settings.DOCUSEAL_KEY = "test_docuseal_key"
-    settings.DOCUSEAL_ICLA_TEMPLATE_ID = "123456"
-    settings.DOCUSEAL_CCLA_TEMPLATE_ID = "123457"
-    settings.ICLA_WEBHOOK_SECRET_SLUG = "test_secret_slug"
-    settings.CCLA_WEBHOOK_SECRET_SLUG = "test_secret_slug"
-    settings.ICLA_SUBMISSION_SUCCESS_URL = "https://example.com/success/"
+def set_settings(monkeypatch):
+    monkeypatch.setenv("DJANGO_DOCUSEAL_KEY", "test_docuseal_key")
+    monkeypatch.setenv("DJANGO_DOCUSEAL_ICLA_TEMPLATE_ID", "123456")
+    monkeypatch.setenv("DJANGO_DOCUSEAL_CCLA_TEMPLATE_ID", "123457")
+    monkeypatch.setenv("DJANGO_ICLA_WEBHOOK_SECRET_SLUG", "test_secret_slug")
+    monkeypatch.setenv("DJANGO_CCLA_WEBHOOK_SECRET_SLUG", "test_secret_slug")
+    monkeypatch.setenv("DJANGO_ICLA_SUBMISSION_SUCCESS_URL", "https://example.com/success/")
 
 
 @pytest.fixture()

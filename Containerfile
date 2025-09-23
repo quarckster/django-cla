@@ -19,6 +19,8 @@ ENV PATH="$PATH:/home/cla/.local/bin"
 
 COPY base/ ./base/
 COPY cla/ ./cla/
+COPY api/ ./api/
+COPY personnel/ ./personnel/
 COPY pyproject.toml uv.lock manage.py run.sh ./
 
 RUN uv sync --locked --no-dev

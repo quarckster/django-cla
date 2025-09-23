@@ -14,13 +14,8 @@ from cla.models import ICLA
 
 @pytest.fixture(autouse=True)
 def set_settings(monkeypatch):
-    monkeypatch.setenv("DJANGO_ICLA_WEBHOOK_SECRET_SLUG", "test_secret_slug")
+    monkeypatch.setenv("DJANGO_CLA_CHECK_WEBHOOK_SECRET_SLUG", "test_secret_slug")
     monkeypatch.setenv("DJANGO_GITHUB_API_TOKEN", "dummy_token")
-
-
-@pytest.fixture
-def client_url() -> str:
-    return reverse("webhooks-icla-check")
 
 
 HEADERS = {

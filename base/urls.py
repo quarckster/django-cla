@@ -13,6 +13,7 @@ from api.views import get_person_tag
 from api.views import handle_github_pull_request_webhook
 from api.views import is_person_in_group
 from api.views import list_people
+from api.views import send_message_from_contact_form
 from cla.views import get_ccla_pdf
 from cla.views import get_icla_pdf
 from cla.views import handle_ccla_submission_completed_webhook
@@ -21,6 +22,7 @@ from cla.views import send_icla_signing_request
 
 
 urlpatterns = [
+    path("contact/submit/", send_message_from_contact_form, name="contact-submit"),
     path("icla/submit/", send_icla_signing_request, name="icla-submit"),
     path(
         f"webhooks/ccla/{settings.CCLA_WEBHOOK_SECRET_SLUG}/",

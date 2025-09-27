@@ -33,11 +33,11 @@ class Person(models.Model):
     name = models.CharField(max_length=255)
     country = models.CharField(max_length=255, blank=True)
     joined_at = models.DateField(null=True, blank=True)
-    github = models.CharField(unique=True, max_length=255, blank=True)
-    ghe = models.CharField(unique=True, max_length=255, blank=True, verbose_name="GHE")
+    github = models.CharField(unique=True, max_length=255, blank=True, null=True)
+    ghe = models.CharField(unique=True, max_length=255, blank=True, null=True, verbose_name="GHE")
     nick = models.CharField(max_length=255, blank=True)
-    rev = models.CharField(unique=True, max_length=255, blank=True)
-    pgp = models.CharField(unique=True, max_length=255, blank=True, verbose_name="PGP")
+    rev = models.CharField(unique=True, max_length=255, blank=True, null=True)
+    pgp = models.CharField(unique=True, max_length=255, blank=True, null=True, verbose_name="PGP")
 
     groups = models.ManyToManyField(
         Group,

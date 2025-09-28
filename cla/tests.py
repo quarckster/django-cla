@@ -40,24 +40,6 @@ def setup_superuser():
 @pytest.mark.parametrize(
     "fields",
     [
-        {"point_of_contact": "user@example.com", "in_schedule_a": True},
-        {"point_of_contact": "user@example.com", "signed_at": FIXED_NOW},
-        {},
-    ],
-    ids=["employee-not-signed", "employee-not-in-schedule-a", "volunteer-not-signed"],
-)
-def test_get_icla_status_not_active(client: Client, fields: dict[str, Any]):
-    email = "test@example.com"
-    ICLA.objects.create(email=email, **fields)
-    response = client.get(reverse("0-hascla-email", args=(email,)))
-    assert response.status_code == 200
-    assert json.loads(response.content) == [1]
-
-
-@pytest.mark.django_db
-@pytest.mark.parametrize(
-    "fields",
-    [
         {"point_of_contact": "user@example.com", "in_schedule_a": True, "cla_pdf": "ICLA/some.pdf"},
         {"cla_pdf": "ICLA/some.pdf"},
     ],

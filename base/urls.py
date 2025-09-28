@@ -2,17 +2,17 @@ from django.conf import settings
 from django.contrib import admin
 from django.urls import path
 
-from api.views import find_person
-from api.views import get_email_cla
-from api.views import get_group_members
-from api.views import get_group_members_cla
-from api.views import get_list_clas
-from api.views import get_person_cla
-from api.views import get_person_membership
-from api.views import get_person_tag
+from api.legacy_api_views import find_person
+from api.legacy_api_views import get_email_cla
+from api.legacy_api_views import get_group_members
+from api.legacy_api_views import get_group_members_cla
+from api.legacy_api_views import get_list_clas
+from api.legacy_api_views import get_person_cla
+from api.legacy_api_views import get_person_membership
+from api.legacy_api_views import get_person_tag
+from api.legacy_api_views import is_person_in_group
+from api.legacy_api_views import list_people
 from api.views import handle_github_pull_request_webhook
-from api.views import is_person_in_group
-from api.views import list_people
 from api.views import send_message_from_contact_form
 from cla.views import get_ccla_pdf
 from cla.views import get_icla_pdf

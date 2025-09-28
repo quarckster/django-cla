@@ -5,6 +5,7 @@ from itertools import chain
 
 from django.db import models
 from django.db.models import Q
+from django.utils import timezone
 
 
 class Group(models.Model):
@@ -12,16 +13,24 @@ class Group(models.Model):
     name = models.CharField(max_length=255)
 
     @property
+    def active_members(self) -> list[Person]:
+        today = timezone.now().date()
+        return self.members.filter(
+            Q(membership__since__isnull=True) | Q(membership__since__lte=today),
+            Q(membership__until__isnull=True) | Q(membership__until__gt=today),
+        ).distinct()
+
+    @property
     def icla_emails(self) -> list[str]:
         result = []
-        members = [person for person in self.members.all()]
+        members = [person for person in self.active_members]
         for member in members:
             for icla in member.iclas.all():
                 if icla.is_active:
                     result.append(icla.email)
         return result
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
@@ -74,7 +83,12 @@ class Person(models.Model):
 
     @property
     def memberof(self) -> dict[str, str]:
-        return {m.group.name: str(m.since) for m in self.membership_set.all()}
+        today = timezone.now().date()
+        query_filter = (
+            Q(since__isnull=True) | Q(since__lte=today),
+            Q(until__isnull=True) | Q(until__gt=today),
+        )
+        return {m.group.name: str(m.since) for m in self.membership_set.filter(*query_filter)}
 
     @classmethod
     def list_people(cls) -> list[list[str | dict[str, str]]]:
@@ -104,6 +118,9 @@ class Membership(models.Model):
 
 
 class Identity(models.Model):
+    class Meta:
+        verbose_name_plural = "Identities"
+
     person = models.ForeignKey(Person, on_delete=models.CASCADE, related_name="identities")
     identity = models.CharField(max_length=255)
 

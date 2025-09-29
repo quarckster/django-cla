@@ -158,7 +158,7 @@ def test_find_person_endpoint_success(client: Client):
 @pytest.mark.django_db
 def test_find_person_endpoint_not_found_returns_empty_body(client: Client):
     response = client.get(reverse("0-person-id", args=("nobody",)))
-    assert response.status_code == 200
+    assert response.status_code == 204
     assert response.content == b""
 
 
@@ -185,7 +185,7 @@ def test_is_person_in_group_yes_and_no(client: Client):
     assert json.loads(yes_resp.content) == [p.memberof["qa"]]
 
     no_resp = client.get(reverse("0-person-id-ismemberof-group", args=("Ivan", "dev")))
-    assert no_resp.status_code == 200
+    assert no_resp.status_code == 204
     assert no_resp.content == b""
 
 
@@ -197,7 +197,7 @@ def test_get_person_tag_present_and_missing(client: Client):
     assert json.loads(has_tag.content) == ["DE"]
 
     missing_tag = client.get(reverse("0-person-id-valueoftag-tag", args=("Jack", "pgp")))
-    assert missing_tag.status_code == 200
+    assert missing_tag.status_code == 204
     assert missing_tag.content == b""
 
 
@@ -219,7 +219,7 @@ def test_get_person_cla_returns_active_emails(client: Client):
 @pytest.mark.django_db
 def test_get_person_cla_person_not_found_is_empty(client: Client):
     resp = client.get(reverse("0-person-id-hascla", args=("Ghost",)))
-    assert resp.status_code == 200
+    assert resp.status_code == 204
     assert resp.content == b""
 
 
@@ -249,7 +249,7 @@ def test_get_group_members_only_active(client: Client):
 @pytest.mark.django_db
 def test_get_group_members_group_not_found_returns_empty(client: Client):
     resp = client.get(reverse("0-group-group-members", args=("nope",)))
-    assert resp.status_code == 200
+    assert resp.status_code == 204
     assert resp.content == b""
 
 
@@ -278,7 +278,7 @@ def test_get_group_members_cla_collects_icla_emails_from_active_members(client: 
 @pytest.mark.django_db
 def test_get_group_members_cla_group_not_found_returns_empty(client: Client):
     resp = client.get(reverse("0-group-group-clas", args=("missing",)))
-    assert resp.status_code == 200
+    assert resp.status_code == 204
     assert resp.content == b""
 
 
@@ -310,5 +310,5 @@ def test_get_icla_status_not_active(client: Client, fields: dict[str, Any]):
     email = "test@example.com"
     ICLA.objects.create(email=email, **fields)
     response = client.get(reverse("0-hascla-email", args=(email,)))
-    assert response.status_code == 200
+    assert response.status_code == 204
     assert response.content == b""

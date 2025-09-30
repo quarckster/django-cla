@@ -3,6 +3,7 @@ import re
 from urllib.parse import quote
 
 import requests
+from django.http import HttpResponse
 
 from base import settings
 from cla.models import ICLA
@@ -67,7 +68,7 @@ def get_pr_commits(commits_url: str) -> dict:
     return r.json()
 
 
-def process(pr: dict) -> None:
+def process(pr: dict) -> HttpResponse:
     alltrivial = True
     missing = set()
     commits_url = pr["commits_url"]
@@ -82,9 +83,12 @@ def process(pr: dict) -> None:
     if alltrivial:
         update_status(pr, SUCCESS, "Trivial")
         remove_label(pr)
+        return HttpResponse("Trivial")
     elif not missing:
         update_status(pr, SUCCESS, "CLA found")
         remove_label(pr)
+        return HttpResponse("CLA Found")
     else:
         update_status(pr, FAILURE, f"CLA missing: {', '.join(missing)}")
         add_label(pr)
+        return HttpResponse("CLA missing")

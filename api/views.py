@@ -38,7 +38,7 @@ NULL_ACTIONS = (
 def handle_github_pull_request_webhook(request: HttpRequest) -> HttpResponse:
     payload = json.loads(request.body)
     if request.headers["X-GitHub-Event"] == "ping":
-        return "pong"
+        return HttpResponse("pong")
     if request.headers["X-GitHub-Event"] != "pull_request":
         return HttpResponseBadRequest("Only pull_request event is supported.")
     if action := payload["action"] in NULL_ACTIONS:

@@ -87,7 +87,7 @@ def process(pr: dict) -> HttpResponse:
     elif not missing:
         update_status(pr, SUCCESS, "CLA found")
         remove_label(pr)
-        return HttpResponse("CLA Found")
+        return HttpResponse("CLA found")
     else:
         update_status(pr, FAILURE, f"CLA missing: {', '.join(missing)}")
         add_label(pr)

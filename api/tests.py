@@ -60,7 +60,7 @@ def test_process_cla_trivial(client: Client, mocker: MockerFixture):
     resp = client.post(reverse("webhooks-icla-check"), body, content_type="application/json", headers=HEADERS)
 
     assert resp.status_code == 200
-    assert resp.content == b"ok"
+    assert resp.content == b"Trivial"
 
     # requests.get called for commits
     m_get.assert_called_once_with(FAKE_PR["commits_url"], headers=cla_check.get_headers(settings.GITHUB_API_TOKEN))
@@ -88,7 +88,7 @@ def test_process_missing_cla(client: Client, mocker: MockerFixture):
     # DB: let ICLA lookup 404 naturally (empty DB)
     resp = client.post(reverse("webhooks-icla-check"), body, content_type="application/json", headers=HEADERS)
     assert resp.status_code == 200
-    assert resp.content == b"ok"
+    assert resp.content == b"CLA missing"
 
     # Status updated (POST to statuses) and label added (POST to labels)
     status_url = FAKE_PR["_links"]["statuses"]["href"]
@@ -117,7 +117,7 @@ def test_process_cla_in_db(client: Client, mocker: MockerFixture):
 
     resp = client.post(reverse("webhooks-icla-check"), body, content_type="application/json", headers=HEADERS)
     assert resp.status_code == 200
-    assert resp.content == b"ok"
+    assert resp.content == b"CLA found"
 
     status_url = FAKE_PR["_links"]["statuses"]["href"]
     assert any(call.args[0] == status_url for call in m_post.mock_calls)
@@ -157,7 +157,7 @@ def test_process_cla_multiple_commits_non_trivial(client: Client, mocker: Mocker
 
     resp = client.post(reverse("webhooks-icla-check"), body, content_type="application/json", headers=HEADERS)
     assert resp.status_code == 200
-    assert resp.content == b"ok"
+    assert resp.content == b"CLA missing"
 
     # Failure status and add_label invoked
     status_url = FAKE_PR["_links"]["statuses"]["href"]
@@ -187,7 +187,7 @@ def test_process_cla_multiple_commits_all_trivial(client: Client, mocker: Mocker
 
     resp = client.post(reverse("webhooks-icla-check"), body, content_type="application/json", headers=HEADERS)
     assert resp.status_code == 200
-    assert resp.content == b"ok"
+    assert resp.content == b"Trivial"
 
     status_url = FAKE_PR["_links"]["statuses"]["href"]
     assert any(call.args[0] == status_url for call in m_post.mock_calls)

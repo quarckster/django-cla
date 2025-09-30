@@ -1,9 +1,9 @@
 import json
 from datetime import date
-from datetime import timedelta
-from typing import Any
 from datetime import datetime
+from datetime import timedelta
 from datetime import timezone
+from typing import Any
 
 import pytest
 from django.test import Client
@@ -46,7 +46,6 @@ def make_person(
 
 def add_membership(person: Person, group: Group, *, since: date | None, until: date | None):
     Membership.objects.create(person=person, group=group, since=since, until=until)
-
 
 
 @pytest.mark.django_db
@@ -293,8 +292,8 @@ def test_get_list_clas_returns_sorted_active_emails(client: Client):
     assert json.loads(resp.content) == ["a@example.org", "b@example.org"]
 
 
-
 FIXED_NOW = datetime(2025, 6, 25, 13, 45, 31, 892000, tzinfo=timezone.utc)
+
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(

@@ -311,3 +311,20 @@ def test_get_icla_status_not_active(client: Client, fields: dict[str, Any]):
     response = client.get(reverse("0-hascla-email", args=(email,)))
     assert response.status_code == 204
     assert response.content == b""
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "fields",
+    [
+        {"point_of_contact": "user@example.com", "in_schedule_a": True, "cla_pdf": "ICLA/some.pdf"},
+        {"cla_pdf": "ICLA/some.pdf"},
+    ],
+    ids=["employee", "volunteer"],
+)
+def test_get_icla_status_active(client: Client, fields: dict[str, Any]):
+    email = "test@example.com"
+    ICLA.objects.create(email=email, **fields)
+    response = client.get(reverse("0-hascla-email", args=(email,)))
+    assert response.status_code == 200
+    assert json.loads(response.content) == [1]

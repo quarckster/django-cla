@@ -3,7 +3,6 @@ import uuid
 from datetime import datetime
 from datetime import timezone
 from pathlib import Path
-from typing import Any
 
 import pytest
 from django.conf import settings
@@ -19,14 +18,17 @@ from cla.models import ICLA
 FIXED_NOW = datetime(2025, 6, 25, 13, 45, 31, 892000, tzinfo=timezone.utc)
 
 
-@pytest.fixture(autouse=True)
-def set_settings(monkeypatch):
-    monkeypatch.setenv("DJANGO_DOCUSEAL_KEY", "test_docuseal_key")
-    monkeypatch.setenv("DJANGO_DOCUSEAL_ICLA_TEMPLATE_ID", "123456")
-    monkeypatch.setenv("DJANGO_DOCUSEAL_CCLA_TEMPLATE_ID", "123457")
-    monkeypatch.setenv("DJANGO_ICLA_WEBHOOK_SECRET_SLUG", "test_secret_slug")
-    monkeypatch.setenv("DJANGO_CCLA_WEBHOOK_SECRET_SLUG", "test_secret_slug")
-    monkeypatch.setenv("DJANGO_ICLA_SUBMISSION_SUCCESS_URL", "https://example.com/success/")
+@pytest.fixture(autouse=True, scope="module")
+def set_settings():
+    with pytest.MonkeyPatch.context() as mp:
+        mp.setattr(settings, "CLA_REPLY_TO_EMAIL", "test@example.com")
+        mp.setattr(settings, "DOCUSEAL_KEY", "test_docuseal_key")
+        mp.setattr(settings, "DOCUSEAL_ICLA_TEMPLATE_ID", "123456")
+        mp.setattr(settings, "DOCUSEAL_CCLA_TEMPLATE_ID", "123457")
+        mp.setattr(settings, "ICLA_WEBHOOK_SECRET_SLUG", "test_secret_slug")
+        mp.setattr(settings, "CCLA_WEBHOOK_SECRET_SLUG", "test_secret_slug")
+        mp.setattr(settings, "ICLA_SUBMISSION_SUCCESS_URL", "https://example.com/success/")
+        yield
 
 
 @pytest.fixture()
@@ -34,23 +36,6 @@ def setup_superuser():
     User = get_user_model()
     if not User.objects.filter(is_superuser=True).exists():
         User.objects.create_superuser("admin", "admin@example.com", "password123")
-
-
-@pytest.mark.django_db
-@pytest.mark.parametrize(
-    "fields",
-    [
-        {"point_of_contact": "user@example.com", "in_schedule_a": True, "cla_pdf": "ICLA/some.pdf"},
-        {"cla_pdf": "ICLA/some.pdf"},
-    ],
-    ids=["employee", "volunteer"],
-)
-def test_get_icla_status_active(client: Client, fields: dict[str, Any]):
-    email = "test@example.com"
-    ICLA.objects.create(email=email, **fields)
-    response = client.get(reverse("0-hascla-email", args=(email,)))
-    assert response.status_code == 200
-    assert json.loads(response.content) == [1]
 
 
 @pytest.mark.django_db
@@ -76,7 +61,7 @@ def test_send_signing_request_icla_new_email(
         {
             "template_id": settings.DOCUSEAL_ICLA_TEMPLATE_ID,
             "send_email": True,
-            "reply_to": "cla@openssl.org",
+            "reply_to": "test@example.com",
             "submitters": [
                 {
                     "email": "new_contributor@example.com",

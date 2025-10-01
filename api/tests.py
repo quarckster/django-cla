@@ -12,10 +12,12 @@ from api import cla_check
 from cla.models import ICLA
 
 
-@pytest.fixture(autouse=True)
-def set_settings(monkeypatch):
-    monkeypatch.setenv("DJANGO_CLA_CHECK_WEBHOOK_SECRET_SLUG", "test_secret_slug")
-    monkeypatch.setenv("DJANGO_GITHUB_API_TOKEN", "dummy_token")
+@pytest.fixture(autouse=True, scope="module")
+def set_settings():
+    with pytest.MonkeyPatch.context() as mp:
+        mp.setattr(settings, "CLA_CHECK_WEBHOOK_SECRET_SLUG", "test_secret_slug")
+        mp.setattr(settings, "GITHUB_API_TOKEN", "dummy_token")
+        yield
 
 
 HEADERS = {

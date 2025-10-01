@@ -209,3 +209,5 @@ __marimo__/
 
 .secrets.toml
 settings.toml
+.secrets.yaml
+settings.yaml
